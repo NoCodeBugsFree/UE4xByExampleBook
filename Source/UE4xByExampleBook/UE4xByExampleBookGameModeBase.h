@@ -14,7 +14,15 @@ class UE4XBYEXAMPLEBOOK_API AUE4xByExampleBookGameModeBase : public AGameModeBas
 {
 	GENERATED_BODY()
 	
-	
+public:
+
+
+
+protected:
+
+
+
+private:
 	
 	
 };
