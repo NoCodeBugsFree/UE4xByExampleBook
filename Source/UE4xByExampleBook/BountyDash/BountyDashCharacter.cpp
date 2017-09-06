@@ -48,14 +48,11 @@ ABountyDashCharacter::ABountyDashCharacter()
 	check(FollowCamera);
 
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetIncludingScale, USpringArmComponent::SocketName);
+	//FollowCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetIncludingScale, USpringArmComponent::SocketName);
 
 	// Rotational change to make the camera look down slightly
-	FollowCamera->AddRelativeRotation(FQuat(FRotator(-10.0f, 0.0f, 0.0f)));
-
-	// Game Properties
-	CharacterSpeed = 10.0f;
-
+	//FollowCamera->AddRelativeRotation(FQuat(FRotator(-10.0f, 0.0f, 0.0f)));
+	
 	// Poses the input at ID 0 (the default controller)
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 

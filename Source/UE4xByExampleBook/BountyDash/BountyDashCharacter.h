@@ -30,7 +30,7 @@ public:
 
 	// Character lane swap speed
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Logic)
-	float CharacterSpeed;
+	float CharacterSpeed = 10.f;
 	
 protected:
 
