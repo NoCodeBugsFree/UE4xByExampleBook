@@ -18,10 +18,24 @@ public:
 
 	UPowerUpObject();
 
-	EPowerUp GetType();
+	/** Returns the PowerUp Type  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	EPowerUp GetType() const { return PowerUpType; }
 	
 private:
 
-	EPowerUp Type;
+	/** Current PowerUp Type  */
+	EPowerUp PowerUpType;
 
 };
+
+/**
+ * Creating a Plug-in with C++
+ * 1) Plugins-> New Plugin-> Blank -> Name it -> Create Plugin
+ * 2) "Type": "Runtime" - Runtime modules will be loaded in all cases, even in shipped
+ * games. Developer modules will only be loaded in development, runtime, or
+ * editor builds but never in shipping builds, and Editor modules will only be
+ * loaded when the editor is starting up.
+ * 3) in Build.cs add - PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "YourPluginName" });
+ * 4) add new classes to corresponding target module
+ */ 

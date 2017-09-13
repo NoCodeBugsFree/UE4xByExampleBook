@@ -4,11 +4,6 @@
 #include "BountyDashCharacter.h"
 #include "BountyDashGameMode.h"
 
-ABountyDashHUD::ABountyDashHUD()
-{
-
-}
-
 void ABountyDashHUD::BeginPlay()
 {
 	Super::BeginPlay();

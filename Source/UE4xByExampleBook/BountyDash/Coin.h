@@ -15,23 +15,33 @@ class UE4XBYEXAMPLEBOOK_API ACoin : public ABountyDashObject
 	GENERATED_BODY()
 
 public:
+	
+	UFUNCTION()
+	virtual void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
+	
+	/** Shows whether the character is magnet or not */
+	bool bIsBeingPulled;
+
+protected:
 
 	ACoin();
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	UFUNCTION()
-	virtual void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
+	/** Calls to handle character colliding  */
+	void CollideWithCharacter(AActor* OtherActor);
 
+	/** Calls to handle obstacle colliding  */
+	void LiftCollidingCoin(AActor* OtherActor);
 
-	bool BeingPulled;
-
-protected:
-
+	/** Bounty Dash Particles Template  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA")
-	TSubclassOf<class ABountyDashParticle> WhatToSpawn;
+	TSubclassOf<class ABountyDashParticle> BountyDashParticlesToSpawn;
+	
+private:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMeshComponent* Mesh;
+	/** Represents Coin Mesh  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* CoinMesh;
 	
 };

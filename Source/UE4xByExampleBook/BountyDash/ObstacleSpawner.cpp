@@ -26,21 +26,84 @@ void AObstacleSpawner::BeginPlay()
 	Super::BeginPlay();
 	
 	/** fill the SpawnTargets   */
-	TArray<AActor*> FoundTargetPointActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABountyDashTargetPoint::StaticClass(), FoundTargetPointActors);
-	
-	for (auto Actor : FoundTargetPointActors)
-	{
-		ABountyDashTargetPoint* TestActor = Cast<ABountyDashTargetPoint>(Actor);
-		if (TestActor)
-		{
-			SpawnTargets.AddUnique(TestActor);
-		}
-	}
+	FillTheSpawnTargetsArray();
 	
 	/** find the floor and retrieve corresponding data */
+	FindFloorAndRetrieveData();
+
+	/** sets the Game Mode Reference  */
+	BountyDashGameMode = Cast<ABountyDashGameMode>(GetWorld()->GetAuthGameMode());
+}
+
+// Called every frame
+void AObstacleSpawner::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	/** WTF is FTimerHandle ??? =)  */
+	TimeSinceLastSpawn += DeltaTime;
+
+	float GameLevelInFloat = 1.f;
+	
+	if (BountyDashGameMode)
+	{
+		GameLevelInFloat = BountyDashGameMode->GetGameLevel();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AObstacleSpawner::Tick() --- BountyDashGameMode == NULL"));
+		return;
+	}
+
+	float TrueSpawnTime = SpawnTimer / GameLevelInFloat;
+	if (TimeSinceLastSpawn > TrueSpawnTime)
+	{
+		TimeSinceLastSpawn = 0.0f;
+		SpawnObstacle();
+	}
+}
+
+void AObstacleSpawner::SpawnObstacle()
+{
+	if (BountyDashTargetPoints.Num() > 0 && ObstaclesToSpawn.Num() > 0)
+	{
+		/** from zero to hero e.g. BountyDashTargetPoints.Num() - 1 */
+		short Spawner = FMath::Rand() % BountyDashTargetPoints.Num();
+
+		/** from zero to hero again */
+		short Obstical = FMath::Rand() % ObstaclesToSpawn.Num();
+
+		float CapsuleOffset = 0.0f;
+
+		FActorSpawnParameters SpawnInfo;
+
+		/** Where to spawn Transform  */
+		FTransform WhereToSpawnTransform = BountyDashTargetPoints[Spawner]->GetTransform();
+
+		/** Adjust  Spawn Location according to SpawnPoint and Height */
+		WhereToSpawnTransform.SetLocation(FVector(SpawnPoint, WhereToSpawnTransform.GetLocation().Y, WhereToSpawnTransform.GetLocation().Z + 25.f));
+		
+		if (ObstaclesToSpawn[Obstical])
+		{
+			AObstacle* NewObstacle = GetWorld()->SpawnActor<AObstacle>(ObstaclesToSpawn[Obstical], WhereToSpawnTransform, SpawnInfo);
+			if (NewObstacle)
+			{
+				NewObstacle->SetKillPoint(KillPoint);
+
+				USphereComponent* SpawnedObstacleSphereComponent = Cast<USphereComponent>(NewObstacle->GetComponentByClass(USphereComponent::StaticClass()));
+				if (SpawnedObstacleSphereComponent)
+				{
+					/** lift the obstacle to Sphere Radius value  */
+					NewObstacle->AddActorLocalOffset(FVector(0.0f, 0.0f, SpawnedObstacleSphereComponent->GetUnscaledSphereRadius()));
+				}
+			}
+		}
+	}
+}
+
+void AObstacleSpawner::FindFloorAndRetrieveData()
+{
 	TArray<AActor*> FoundFloorActors;
-	TArray<AFloor*> Floors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFloor::StaticClass(), FoundFloorActors);
 
 	for (auto Actor : FoundFloorActors)
@@ -69,53 +132,17 @@ void AObstacleSpawner::BeginPlay()
 	}
 }
 
-// Called every frame
-void AObstacleSpawner::Tick(float DeltaTime)
+void AObstacleSpawner::FillTheSpawnTargetsArray()
 {
-	Super::Tick(DeltaTime);
+	TArray<AActor*> FoundTargetPointActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABountyDashTargetPoint::StaticClass(), FoundTargetPointActors);
 
-	TimeSinceLastSpawn += DeltaTime;
-
-	float GameLevelInFloat = 1.f;
-
-	ABountyDashGameMode* BountyDashGameMode = Cast<ABountyDashGameMode>(GetWorld()->GetAuthGameMode());
-	if (BountyDashGameMode)
+	for (auto Actor : FoundTargetPointActors)
 	{
-		GameLevelInFloat = BountyDashGameMode->GetGameLevel();
-	}
-
-	float TrueSpawnTime = SpawnTimer / GameLevelInFloat;
-	if (TimeSinceLastSpawn > TrueSpawnTime)
-	{
-		TimeSinceLastSpawn = 0.0f;
-		SpawnObstacle();
-	}
-}
-
-void AObstacleSpawner::SpawnObstacle()
-{
-	if (SpawnTargets.Num() > 0 && ObstaclesToSpawn.Num() > 0)
-	{
-		short Spawner = FMath::Rand() % SpawnTargets.Num();
-		short Obstical = FMath::Rand() % ObstaclesToSpawn.Num();
-		float CapsuleOffset = 0.0f;
-
-		FActorSpawnParameters SpawnInfo;
-		FTransform myTrans = SpawnTargets[Spawner]->GetTransform();
-		myTrans.SetLocation(FVector(SpawnPoint, myTrans.GetLocation().Y, myTrans.GetLocation().Z + 25.f));
-		
-		AObstacle* newObs = GetWorld()->SpawnActor<AObstacle>(ObstaclesToSpawn[Obstical], myTrans, SpawnInfo);
-		if (newObs)
+		ABountyDashTargetPoint* TestActor = Cast<ABountyDashTargetPoint>(Actor);
+		if (TestActor)
 		{
-			newObs->SetKillPoint(KillPoint);
-
-			USphereComponent* obsSphere = Cast<USphereComponent>(newObs->GetComponentByClass(USphereComponent::StaticClass()));
-			if (obsSphere)
-			{
-				newObs->AddActorLocalOffset(FVector(0.0f, 0.0f, obsSphere->GetUnscaledSphereRadius()));
-			}
-
+			BountyDashTargetPoints.AddUnique(TestActor);
 		}
 	}
 }
-

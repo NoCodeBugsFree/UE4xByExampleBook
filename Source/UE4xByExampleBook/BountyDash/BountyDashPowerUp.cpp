@@ -12,10 +12,10 @@ ABountyDashPowerUp::ABountyDashPowerUp()
 
 	PowerUp = CreateDefaultSubobject<UPowerUpObject>(TEXT("PowerUp"));
 	check(PowerUp);
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	check(Mesh);
-	Mesh->SetupAttachment(RootComponent);
-	Mesh->SetCollisionProfileName("OverlapAllDynamic");
+	PowerUpMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	check(PowerUpMesh);
+	PowerUpMesh->SetupAttachment(RootComponent);
+	PowerUpMesh->SetCollisionProfileName("OverlapAllDynamic");
 	
 }
 
@@ -31,12 +31,13 @@ void ABountyDashPowerUp::MyOnActorOverlap(AActor* OverlappedActor, AActor* Other
 		}
 	}
 
+	/** Character colliding test  */
 	if (OtherActor && OtherActor->GetClass()->IsChildOf(ABountyDashCharacter::StaticClass()) && !IsPendingKill())
 	{
 		ABountyDashCharacter* BountyDashCharacter = Cast<ABountyDashCharacter>(OtherActor);
 		if (BountyDashCharacter)
 		{
-			BountyDashCharacter->PowerUp(Type);
+			BountyDashCharacter->PowerUp(PowerUpType);
 			
 			// Books way
 			// BountyDashCharacter->PowerUp(PowerUp->GetType());

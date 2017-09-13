@@ -13,6 +13,7 @@ class UE4XBYEXAMPLEBOOK_API ADestroyedFloorPiece : public AActor
 	
 public:	
 	
+	/** Represents  Destructible Mesh */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	class UDestructibleComponent* Destructable;
 
@@ -26,7 +27,5 @@ protected:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-public:	
 	
 };

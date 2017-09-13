@@ -20,33 +20,18 @@ ABountyDashGameMode::ABountyDashGameMode()
 
 	RunTime = 0.0f;
 	bGameOver = false;
-	startGameOverCount = false;
-	timeTillGameOver = 2.0f;
-	gameOverTimer = 0.0f;
+	StartGameOverCount = false;
+	TimeTillGameOver = 2.0f;
+	GameOverTimer = 0.0f;
 }
 
-void ABountyDashGameMode::CharScoreUp(unsigned int CharScore)
+void ABountyDashGameMode::CharacterScoreUp(int32 CharacterScore)
 {
-	if (CharScore != 0 && CharScore % NumCoinsForSpeedIncrease == 0)
+	if (CharacterScore != 0 && CharacterScore % NumCoinsForSpeedIncrease == 0)
 	{
 		GameSpeed += GameSpeedIncrease;
 		GameLevel++;
 	}
-}
-
-float ABountyDashGameMode::GetInvGameSpeed()
-{
-	return -GameSpeed;
-}
-
-float ABountyDashGameMode::GetGameSpeed()
-{
-	return GameSpeed;
-}
-
-int32 ABountyDashGameMode::GetGameLevel()
-{
-	return GameLevel;
 }
 
 void ABountyDashGameMode::ReduceGameSpeed()
@@ -62,28 +47,23 @@ void ABountyDashGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (!startGameOverCount)
+	if (!StartGameOverCount)
 	{
 		RunTime += DeltaSeconds;
 	}
 	else
 	{
-		gameOverTimer += DeltaSeconds;
-		if (gameOverTimer >= timeTillGameOver)
+		GameOverTimer += DeltaSeconds;
+		if (GameOverTimer >= TimeTillGameOver)
 		{
 			bGameOver = true;
 		}
 	}
 }
 
-bool ABountyDashGameMode::GetGameOver()
-{
-	return bGameOver;
-}
-
 void ABountyDashGameMode::GameOver()
 {
-	startGameOverCount = true;
+	StartGameOverCount = true;
 }
 
 void ABountyDashGameMode::SetGamePaused(bool gamePaused)

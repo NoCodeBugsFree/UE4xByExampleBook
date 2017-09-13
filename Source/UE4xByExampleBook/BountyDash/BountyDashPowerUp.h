@@ -19,20 +19,22 @@ public:
 
 	ABountyDashPowerUp();
 
-	/** Test  */
+	/** PowerUp Type  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA")
-	EPowerUp Type = EPowerUp::MAGNET;
+	EPowerUp PowerUpType = EPowerUp::MAGNET;
 
 protected:
 
+	/** PowerUp Static Mesh  */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* Mesh;
+	UStaticMeshComponent* PowerUpMesh;
 
 	UFUNCTION()
 	virtual void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
 
 private:
 	
+	/** PowerUp Object  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	class UPowerUpObject* PowerUp;
 	

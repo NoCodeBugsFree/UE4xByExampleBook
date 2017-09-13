@@ -18,63 +18,81 @@ public:
 
 	ABountyDashGameMode();
 
-	void CharScoreUp(unsigned int CharScore);
-
-	UFUNCTION()
-	float GetInvGameSpeed();
-
-	UFUNCTION()
-	float GetGameSpeed();
-
-	UFUNCTION()
-	int32 GetGameLevel();
-
-	void ReduceGameSpeed();
-
 	virtual void Tick(float DeltaSeconds) override;
 
-	float GetRunTime() const { return RunTime; }
+	/**  Changes game values based on that score  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void CharacterScoreUp(int32 CharacterScore);
 
-	UFUNCTION()
-	bool GetGameOver();
-
-	UFUNCTION()
+	/** Calls to Reduce Game Speed. Reduce the game speed by GameSpeedIncrease  */
+	void ReduceGameSpeed();
+	
+	/**  Prepares Gave Over. Sets the bGameOver flag to false  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
 	void GameOver();
 
-	UFUNCTION()
-	void SetGamePaused(bool gamePaused);
+	/**  Pauses the Game  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void SetGamePaused(bool bNewGamePaused);
 
 protected:
 
-	/** determine how many coins it take to increase the speed of the game  */
+	/** Determines how many coins it take to increase the speed of the game  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 NumCoinsForSpeedIncrease;
+	int32 NumCoinsForSpeedIncrease = 5;
 
-	/** determine how much faster the objects move when the NumCoinsForSpeedIncrease value has been met.  */
+	/** Determines how much faster the objects move when the NumCoinsForSpeedIncrease value has been met.  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float GameSpeedIncrease;
+	float GameSpeedIncrease = 5.f;
 
-	UPROPERTY()
-	float RunTime;
+	/** Total Run time to show in HUD  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
+	float RunTime = 0.0f;
 
-	UPROPERTY()
-	bool bGameOver;
+	/** Game Over flag */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
+	bool bGameOver = false;
 
-	UPROPERTY()
-	bool startGameOverCount;
+	/** Start Game Over Count flag */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
+	bool StartGameOverCount = false;
 
-	UPROPERTY()
-	float timeTillGameOver;
+	/** Simple Game Over delay */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
+	float TimeTillGameOver = 2.f;
 
-	UPROPERTY()
-	float gameOverTimer;
+	/** Current Game Over Timer */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
+	float GameOverTimer = 0.0f;
 
-private:
-	
-	UPROPERTY()
-	float GameSpeed;
+	/** Current game speed  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
+	float GameSpeed = 10.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	int32 GameLevel;
+	/** Current game level  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
+	int32 GameLevel = 1;
+
+public:
+
+	/** Returns Inverse Game Speed  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	float GetInverseGameSpeed() const { return -GameSpeed; }
+
+	/** Returns Game Speed  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	float GetGameSpeed() const { return GameSpeed; }
+
+	/** Returns Game Level  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	int32 GetGameLevel() const { return GameLevel; }
+
+	/** Returns Run Time */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	float GetRunTime() const { return RunTime; }
+
+	/** Returns bGameOver flag */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	bool GetGameOver() const { return bGameOver; }
 	
 };

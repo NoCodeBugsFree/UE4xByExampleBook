@@ -21,42 +21,42 @@ AFloor::AFloor()
 	if (MyMesh.Succeeded())
 	{
 		NumRepeatingMesh = 80;
-		FBoxSphereBounds myBounds = MyMesh.Object->GetBounds();
-		float XBounds = myBounds.BoxExtent.X * 2;
-		float ScenePos = ((XBounds * (NumRepeatingMesh - 1)) / 2.0f) * -1;
-		KillPoint = ScenePos - (XBounds * 0.5f);
-		SpawnPoint = (ScenePos * -1) + (XBounds * 0.5f);
+		FBoxSphereBounds MeshAssetBounds = MyMesh.Object->GetBounds();
+		float XBounds = MeshAssetBounds.BoxExtent.X * 2;
+		float ScenePosition = ((XBounds * (NumRepeatingMesh - 1)) / 2.0f) * -1;
+		KillPoint = ScenePosition - (XBounds * 0.5f);
+		SpawnPoint = (ScenePosition * -1) + (XBounds * 0.5f);
 
 		for (int i = 0; i < NumRepeatingMesh; ++i)
 		{
 			// Initialize Scene
 			FString SceneName = "Scene" + FString::FromInt(i);
 			FName SceneID = FName(*SceneName);
-			USceneComponent* thisScene = CreateDefaultSubobject<USceneComponent>(SceneID);
-			check(thisScene);
-			thisScene->SetupAttachment(RootComponent);
-			thisScene->SetRelativeLocation(FVector(ScenePos, 0.0f, 0.0f));
-			ScenePos += XBounds;
-			FloorMeshScenes.Add(thisScene);
+			USceneComponent* ThisScene = CreateDefaultSubobject<USceneComponent>(SceneID);
+			check(ThisScene);
+			ThisScene->SetupAttachment(RootComponent);
+			ThisScene->SetRelativeLocation(FVector(ScenePosition, 0.0f, 0.0f));
+			ScenePosition += XBounds;
+			FloorMeshScenes.Add(ThisScene);
 
 			// Initialize Mesh
 			FString MeshName = "Mesh" + FString::FromInt(i);
-			UStaticMeshComponent* thisMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName(*MeshName));
-			check(thisMesh);
+			UStaticMeshComponent* ThisMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName(*MeshName));
+			check(ThisMesh);
 
-			thisMesh->SetupAttachment(FloorMeshScenes[i]);
-			thisMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-			thisMesh->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+			ThisMesh->SetupAttachment(FloorMeshScenes[i]);
+			ThisMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+			ThisMesh->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
-			thisMesh->SetStaticMesh(MyMesh.Object);
+			ThisMesh->SetStaticMesh(MyMesh.Object);
 
-			FloorMeshes.Add(thisMesh);
+			FloorMeshes.Add(ThisMesh);
 		}
 
 		CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollsionBox"));
 		check(CollisionBox);
 		CollisionBox->SetupAttachment(RootComponent);
-		CollisionBox->SetBoxExtent(FVector(SpawnPoint, myBounds.BoxExtent.Y, myBounds.BoxExtent.Z));
+		CollisionBox->SetBoxExtent(FVector(SpawnPoint, MeshAssetBounds.BoxExtent.Y, MeshAssetBounds.BoxExtent.Z));
 		CollisionBox->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	}
 
@@ -76,45 +76,41 @@ void AFloor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/** for each of 80 scenes...  */
 	for (auto Scene : FloorMeshScenes)
 	{
 		float XValue = 0.f;
 		
 		if (BountyDashGameMode)
 		{
-			XValue = BountyDashGameMode->GetInvGameSpeed();
+			XValue = BountyDashGameMode->GetInverseGameSpeed();
 		}
 
 		if (Scene)
 		{
 			Scene->AddLocalOffset(FVector(XValue, 0.0f, 0.0f));
 
-			if (Scene->GetComponentTransform().GetLocation().X <= KillPoint)
+			if (Scene->GetComponentTransform().GetLocation().X <= KillPoint && DestroyedFloorPieceTemplate)
 			{
 				Scene->SetRelativeLocation(FVector(SpawnPoint, 0.0f, 0.0f));
 
 				// spawn destructible mesh and destroy
-				ADestroyedFloorPiece* thisPiece = GetWorld()->SpawnActor<ADestroyedFloorPiece>(
-					ADestroyedFloorPiece::StaticClass(),
+				ADestroyedFloorPiece* ThisPiece = GetWorld()->SpawnActor<ADestroyedFloorPiece>(
+					DestroyedFloorPieceTemplate,
 					Scene->GetComponentTransform());
-				if (thisPiece)
+				if (ThisPiece)
 				{
-					thisPiece->Destructable->ApplyDamage(100000, thisPiece->GetActorLocation(),
+					ThisPiece->Destructable->ApplyDamage(100000, ThisPiece->GetActorLocation(),
 						FVector(-FMath::RandRange(-10, 10), -FMath::RandRange(-10, 10), -FMath::RandRange(-10, 10)), 10000);
 				}
+				/**
+					Once the game has built, play the project then 
+					detach the camera and navigate it to the killPoint of the floor and
+					you will see destructions:
+				*/
 				Scene->SetRelativeLocation(FVector(SpawnPoint, 0.0f, 0.0f));
 			}
 		}
 	}
-}
-
-float AFloor::GetKillPoint()
-{
-	return KillPoint;
-}
-
-float AFloor::GetSpawnPoint()
-{
-	return SpawnPoint;
 }
 

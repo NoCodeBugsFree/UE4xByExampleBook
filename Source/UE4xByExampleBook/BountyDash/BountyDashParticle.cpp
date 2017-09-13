@@ -5,8 +5,8 @@
 
 ABountyDashParticle::ABountyDashParticle()
 {
-	particleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Explosion"));
-	check(particleSystem);
-	particleSystem->SetupAttachment(RootComponent);
+	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Explosion"));
+	check(ParticleSystemComponent);
+	ParticleSystemComponent->SetupAttachment(RootComponent);
 
 }

@@ -11,16 +11,10 @@ class UE4XBYEXAMPLEBOOK_API AFloor : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+protected:
 
 	// Sets default values for this actor's properties
 	AFloor();
-
-	float GetKillPoint();
-
-	float GetSpawnPoint();
-
-protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,19 +22,35 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+	/** 80 Scenes  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
 	TArray<USceneComponent*> FloorMeshScenes;
 
-	UPROPERTY(EditAnywhere)
+	/** 80 Meshes  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
 	TArray<UStaticMeshComponent*> FloorMeshes;
 
-	UPROPERTY(EditAnywhere)
+	/** Destroyed Floor Piece Template to spawn wall of death  */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA", meta = (BlueprintProtected = "true"))
+	TSubclassOf<class ADestroyedFloorPiece> DestroyedFloorPieceTemplate;
+
+
+	/** The reason we are using a BoxComponent 
+	 * instead of the meshes for collision is that we do not want the player
+	 * to translate with the moving meshes. Due to surface friction simulation, having the
+	 * character collide with any of the moving meshes will cause the player to move with
+	 * the mesh. 
+	 */ 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (BlueprintProtected = "true"))
 	class UBoxComponent* CollisionBox;
 
-	int32 NumRepeatingMesh;
+	/** Determines how many meshes we will have in the chain.  */
+	int32 NumRepeatingMesh = 80;
 
+	/** to save output calculations from the constructor so we may use it in the Tick() function.  */
 	float KillPoint;
 
+	/** to save output calculations from the constructor so we may use it in the Tick() function.  */
 	float SpawnPoint;
 
 private:
@@ -49,8 +59,14 @@ private:
 	class ABountyDashGameMode* BountyDashGameMode;
 
 public:	
-	
 
+	/** Returns Kill Point  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	float GetKillPoint() const { return KillPoint; }
+
+	/** Returns Spawn Point  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	float GetSpawnPoint() const { return SpawnPoint; }
 	
 	
 };

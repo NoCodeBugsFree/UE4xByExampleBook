@@ -11,10 +11,10 @@ AObstacle::AObstacle()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	Mesh = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Mesh"));
-	check(Mesh);
-	Mesh->SetupAttachment(Collider);
-	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	DestructibleMesh = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Mesh"));
+	check(DestructibleMesh);
+	DestructibleMesh->SetupAttachment(Collider);
+	DestructibleMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void AObstacle::MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor)
@@ -27,8 +27,4 @@ void AObstacle::MyOnActorEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
 
 }
 
-UDestructibleComponent* AObstacle::GetDestructable()
-{
-	return Mesh;
-}
 

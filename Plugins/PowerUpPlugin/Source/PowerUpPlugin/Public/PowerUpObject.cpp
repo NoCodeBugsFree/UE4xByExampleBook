@@ -7,25 +7,20 @@ UPowerUpObject::UPowerUpObject(const FObjectInitializer& ObjectInitializer) : Su
 	{
 	case 0:
 	{
-		Type = EPowerUp::SPEED;
+		PowerUpType = EPowerUp::SPEED;
 		break;
 	}
 	case 1:
 	{
-		Type = EPowerUp::SMASH;
+		PowerUpType = EPowerUp::SMASH;
 		break;
 	}
 	case 2:
 	{
-		Type = EPowerUp::MAGNET;
+		PowerUpType = EPowerUp::MAGNET;
 		break;
 	}
 	default:
 		break;
 	}
-}
-
-EPowerUp UPowerUpObject::GetType()
-{
-	return Type;
 }

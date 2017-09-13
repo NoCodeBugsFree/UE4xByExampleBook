@@ -10,41 +10,7 @@ UCLASS()
 class UE4XBYEXAMPLEBOOK_API ACoinSpawner : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ACoin> CoinObject;
-
-	UPROPERTY()
-	TArray<class ABountyDashTargetPoint*> SpawnTransforms;
-
-	UPROPERTY()
-	class USceneComponent* Root;
-
-	UPROPERTY(EditAnywhere)
-	int32 MaxSetCoins;
-
-	UPROPERTY(EditAnywhere)
-	int32 MinSetCoins;
-
-	UPROPERTY(EditAnywhere)
-	float CoinSetTimeInterval;
-
-	UPROPERTY(EditAnywhere)
-	float CoinTimeInterval;
-
-	UPROPERTY(EditAnywhere)
-	float MovementTimeInterval;
-	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ABountyDashPowerUp> PowerUpObject;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", ClampMax = "100.0", UIMin = "0.0", UIMax = "100.0"))
-	int32 PowerUpChance = 20;
-
-	void SpawnPowerUp();
-
+		
 protected:
 
 	// Sets default values for this actor's properties
@@ -52,39 +18,91 @@ protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+private:
 
+	/** Starts timer  */
 	void SetTimers();
 
+	/** Finds floor actor (intended one instance in the World) and initialize KillPoint and SpawnPoint  */
 	void FindFloorAndInitVariables();
-
+	
+	/** Finds all BountyDashTargetPoint and stores them into the array */
 	void FillSpawnTransforms();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	/** SpawnCoin or SpawnPowerUp depending on PowerUpChance */
 	void SpawnCoin();
 
+	/**  Spawn required amount of coins (NumCoinsToSpawn)  each specified interval (CoinTimeInterval) */
 	void SpawnCoinSet();
 
+	/** Pick the next spawner point (TargetLocation) */
 	void MoveSpawner();
 
-	int32 NumCoinsToSpawn;
+	/** Spawns PowerUp Object  */
+	void SpawnPowerUp();
 
+	// -----------------------------------------------------------------------------------
+
+	/** Spawn Transforms actors  */
+	UPROPERTY()
+	TArray<class ABountyDashTargetPoint*> SpawnTransforms;
+
+	/** Maximum amount of coins to spawn  */
+	UPROPERTY(EditAnywhere)
+	int32 MaxSetCoins = 5;
+
+	/** Minimum amount of coins to spawn  */
+	UPROPERTY(EditAnywhere)
+	int32 MinSetCoins = 3;
+
+	/**  Timer delay for spawn coins Sets */
+	UPROPERTY(EditAnywhere)
+	float CoinSetTimeInterval = 4.f;
+
+	/** Timer delay for spawn each coin  */
+	UPROPERTY(EditAnywhere)
+	float CoinTimeInterval = 0.5f;
+
+	/**  delay to move spawner */
+	UPROPERTY(EditAnywhere)
+	float MovementTimeInterval = 1.f;
+
+	/** Chance to spawn PowerUp object */
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", ClampMax = "100.0", UIMin = "0.0", UIMax = "100.0"))
+	int32 PowerUpChance = 20;
+	
+	/** Current amount of coins to spawn  */
+	int32 NumCoinsToSpawn;
+	
+	/** Kill Point value to set in spawned actors */
 	float KillPoint;
 
+	/** Spawn Point value to set in spawned actors */
 	float SpawnPoint;
 
-	int32 TargetLoc;
+	/** Current spawn location  */
+	int32 TargetLocation;
 
+	/** Coin set spawn timer  */
 	FTimerHandle CoinSetTimerHandle;
 
+	/** Each coin spawn timer  */
 	FTimerHandle CoinTimerHandle;
 
+	/** Move spawn point timer  */
 	FTimerHandle SpawnMoveTimerHandle;
-	
-public:	
-	
 
-	
+	/** Coin To Spawn Template  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class ACoin> CoinObject;
+
+	/** Root  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	class USceneComponent* Root;
+
+	/** PowerUp Object To Spawn Template */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class ABountyDashPowerUp> PowerUpObject;
 	
 };

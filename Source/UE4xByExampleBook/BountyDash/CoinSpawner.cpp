@@ -14,7 +14,7 @@
 ACoinSpawner::ACoinSpawner()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
@@ -30,10 +30,10 @@ void ACoinSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	/** fill the SpawnTransforms array  */
+	/** Fill the SpawnTransforms array  */
 	FillSpawnTransforms();
 	
-	/** find floor actor and initialize variables  */
+	/** Find floor actor and initialize variables  */
 	FindFloorAndInitVariables();
 	
 	// Create Timers
@@ -42,9 +42,9 @@ void ACoinSpawner::BeginPlay()
 
 void ACoinSpawner::SetTimers()
 {
-	FTimerManager& worldTimeManager = GetWorld()->GetTimerManager();
-	worldTimeManager.SetTimer(CoinSetTimerHandle, this, &ACoinSpawner::SpawnCoinSet, CoinSetTimeInterval, false);
-	worldTimeManager.SetTimer(SpawnMoveTimerHandle, this, &ACoinSpawner::MoveSpawner, MovementTimeInterval, true);
+	FTimerManager& WorldTimeManager = GetWorld()->GetTimerManager();
+	WorldTimeManager.SetTimer(CoinSetTimerHandle, this, &ACoinSpawner::SpawnCoinSet, CoinSetTimeInterval, false);
+	WorldTimeManager.SetTimer(SpawnMoveTimerHandle, this, &ACoinSpawner::MoveSpawner, MovementTimeInterval, true);
 }
 
 void ACoinSpawner::FindFloorAndInitVariables()
@@ -83,8 +83,7 @@ void ACoinSpawner::FindFloorAndInitVariables()
 void ACoinSpawner::FillSpawnTransforms()
 {
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABountyDashTargetPoint::StaticClass(),
-		FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABountyDashTargetPoint::StaticClass(), FoundActors);
 
 	for (auto Actor : FoundActors)
 	{
@@ -96,13 +95,6 @@ void ACoinSpawner::FillSpawnTransforms()
 	}
 }
 
-// Called every frame
-void ACoinSpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void ACoinSpawner::SpawnCoin()
 {
 	if (FMath::Rand() % 100 < PowerUpChance)
@@ -112,62 +104,66 @@ void ACoinSpawner::SpawnCoin()
 	} 
 	else
 	{
-		FActorSpawnParameters spawnParams;
+		FActorSpawnParameters SpawnParams;
 
-		FTransform coinTransform = SpawnTransforms[TargetLoc]->GetTransform();
+		FTransform CoinTransform = SpawnTransforms[TargetLocation]->GetTransform();
 
-		coinTransform.SetLocation(FVector(SpawnPoint, coinTransform.GetLocation().Y, coinTransform.GetLocation().Z));
-		ACoin* spawnedCoin = GetWorld()->SpawnActor<ACoin>(CoinObject, coinTransform, spawnParams);
-		if (spawnedCoin)
+		/** Adjust spawn location  */
+		CoinTransform.SetLocation(FVector(SpawnPoint, CoinTransform.GetLocation().Y, CoinTransform.GetLocation().Z));
+
+		ACoin* NewCoin = GetWorld()->SpawnActor<ACoin>(CoinObject, CoinTransform, SpawnParams);
+		if (NewCoin)
 		{
-			USphereComponent* coinSphere = Cast<USphereComponent>(spawnedCoin->GetComponentByClass(USphereComponent::StaticClass()));
-			if (coinSphere)
+			USphereComponent* CoinSphereComponent = Cast<USphereComponent>(NewCoin->GetComponentByClass(USphereComponent::StaticClass()));
+			if (CoinSphereComponent)
 			{
-				float offset = coinSphere->GetUnscaledSphereRadius();
-				spawnedCoin->AddActorLocalOffset(FVector(0.0f, 0.0f, offset));
+				float ZOffset = CoinSphereComponent->GetUnscaledSphereRadius();
+				NewCoin->AddActorLocalOffset(FVector(0.0f, 0.0f, ZOffset));
 			}
 			NumCoinsToSpawn--;
 		}
 		if (NumCoinsToSpawn <= 0)
 		{
-			FTimerManager& worldTimeManager = GetWorld()->GetTimerManager();
-			worldTimeManager.SetTimer(CoinSetTimerHandle, this, &ACoinSpawner::SpawnCoinSet, CoinSetTimeInterval, false);
-			worldTimeManager.ClearTimer(CoinTimerHandle);
+			FTimerManager& WorldTimeManager = GetWorld()->GetTimerManager();
+			WorldTimeManager.SetTimer(CoinSetTimerHandle, this, &ACoinSpawner::SpawnCoinSet, CoinSetTimeInterval, false);
+			WorldTimeManager.ClearTimer(CoinTimerHandle);
 		}
 	}
 }
 
 void ACoinSpawner::SpawnPowerUp()
 {
-	FActorSpawnParameters SpawnInfo;
-	FTransform myTrans = SpawnTransforms[TargetLoc]->GetTransform();
-	myTrans.SetLocation(FVector(SpawnPoint,myTrans.GetLocation().Y, myTrans.GetLocation().Z));
-	ABountyDashPowerUp* newObs = GetWorld()->SpawnActor<ABountyDashPowerUp>(PowerUpObject, myTrans, SpawnInfo);
-	if (newObs)
+	FActorSpawnParameters SpawnParams;
+	FTransform SpawnTransform = SpawnTransforms[TargetLocation]->GetTransform();
+
+	/**  Adjust spawn location  */
+	SpawnTransform.SetLocation(FVector(SpawnPoint,SpawnTransform.GetLocation().Y, SpawnTransform.GetLocation().Z));
+
+	ABountyDashPowerUp* NewPowerUp = GetWorld()->SpawnActor<ABountyDashPowerUp>(PowerUpObject, SpawnTransform, SpawnParams);
+	if (NewPowerUp)
 	{
-		newObs->SetKillPoint(KillPoint);
-		USphereComponent* powerUpSphere = Cast<USphereComponent>(newObs->GetComponentByClass(USphereComponent::StaticClass()));
-		if (powerUpSphere)
+		NewPowerUp->SetKillPoint(KillPoint);
+		USphereComponent* PowerUpSphereComponent = Cast<USphereComponent>(NewPowerUp->GetComponentByClass(USphereComponent::StaticClass()));
+		if (PowerUpSphereComponent)
 		{
-			float offset = powerUpSphere->GetUnscaledSphereRadius();
-			newObs->AddActorLocalOffset(FVector(0.0f, 0.0f, offset));
+			float ZOffset = PowerUpSphereComponent->GetUnscaledSphereRadius();
+			NewPowerUp->AddActorLocalOffset(FVector(0.0f, 0.0f, ZOffset));
 		}
 	}
 }
 
-
 void ACoinSpawner::SpawnCoinSet()
 {
 	NumCoinsToSpawn = FMath::RandRange(MinSetCoins, MaxSetCoins);
-	FTimerManager& worldTimeManager = GetWorld()->GetTimerManager();
+	FTimerManager& WorldTimeManager = GetWorld()->GetTimerManager();
 
 	// Swap active timers
-	worldTimeManager.ClearTimer(CoinSetTimerHandle);
-	worldTimeManager.SetTimer(CoinTimerHandle, this, &ACoinSpawner::SpawnCoin, CoinTimeInterval, true);
+	WorldTimeManager.ClearTimer(CoinSetTimerHandle);
+	WorldTimeManager.SetTimer(CoinTimerHandle, this, &ACoinSpawner::SpawnCoin, CoinTimeInterval, true);
 }
 
 void ACoinSpawner::MoveSpawner()
 {
 	/** FMath::Rand() Returns a random integer between 0 and RAND_MAX, inclusive */
-	TargetLoc = FMath::Rand() % SpawnTransforms.Num();
+	TargetLocation = FMath::Rand() % SpawnTransforms.Num();
 }

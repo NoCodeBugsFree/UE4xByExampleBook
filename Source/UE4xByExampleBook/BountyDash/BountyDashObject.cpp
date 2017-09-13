@@ -36,7 +36,7 @@ void ABountyDashObject::Tick(float DeltaTime)
 
 	if (BountyDashGameMode && !IsPendingKill())
 	{
-		float GameSpeed = BountyDashGameMode->GetInvGameSpeed();
+		float GameSpeed = BountyDashGameMode->GetInverseGameSpeed();
 		AddActorLocalOffset(FVector(GameSpeed, 0.f, 0.f));
 		if (GetActorLocation().X < KillPoint)
 		{
@@ -53,15 +53,5 @@ void ABountyDashObject::MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherA
 void ABountyDashObject::MyOnActorEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 
-}
-
-void ABountyDashObject::SetKillPoint(float point)
-{
-	KillPoint = point;
-}
-
-float ABountyDashObject::GetKillPoint()
-{
-	return KillPoint;
 }
 

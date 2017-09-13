@@ -22,41 +22,56 @@ ABountyDashCharacter::ABountyDashCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	/** Mesh */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMesh(TEXT("SkeletalMesh'/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin'"));
 	if (SkeletalMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(SkeletalMesh.Object);
 	}
+
+	// Rotate and position the mesh so it sits in the capsule component properly
+	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()));
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	
 	
 	// Configure character movement
 	GetCharacterMovement()->JumpZVelocity = 1450.0f;
 	GetCharacterMovement()->GravityScale = 4.5f;
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 
+	/** Create a camera boom (pulls in towards the player if there is a collision)  */
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	check(CameraBoom);
 	CameraBoom->SetupAttachment(RootComponent);
 
 	// The camera follows at this distance behind the character
 	CameraBoom->TargetArmLength = 500.0f;
-
 	// Offset to player
 	CameraBoom->AddRelativeLocation(FVector(0.0f, 0.0f, 160.0f));
+
+
+	/** Follow Camera  */
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	check(FollowCamera);
 
+	FollowCamera->SetupAttachment(CameraBoom);
+
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	//FollowCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetIncludingScale, USpringArmComponent::SocketName);
 
 	// Rotational change to make the camera look down slightly
-	//FollowCamera->AddRelativeRotation(FQuat(FRotator(-10.0f, 0.0f, 0.0f)));
+	FollowCamera->AddRelativeRotation(FRotator(-10.0f, 0.0f, 0.0f));
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyDashCharacter::OnOverlapBegin);
+	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &ABountyDashCharacter::OnOverlapEnd);
 	
 	// Poses the input at ID 0 (the default controller)
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 
+	/** Sounds  */
 	HitObstacleSound = CreateDefaultSubobject<UAudioComponent>(TEXT("HitSound"));
 	HitObstacleSound->SetupAttachment(RootComponent);
 	HitObstacleSound->bAutoActivate = false;
@@ -64,55 +79,21 @@ ABountyDashCharacter::ABountyDashCharacter()
 	DingSound = CreateDefaultSubobject<UAudioComponent>(TEXT("DingSound"));
 	DingSound->SetupAttachment(RootComponent);
 	DingSound->bAutoActivate = false;
-
-
 }
 
 // Called when the game starts or when spawned
 void ABountyDashCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	FillAndSortTargetArray();
+	
+	SetCharacterInTheMiddleLane();
+	
+	SetKillPoint();
 
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyDashCharacter::OnOverlapBegin);
-	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &ABountyDashCharacter::OnOverlapEnd);
-	
-	// fill the TargetArray
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABountyDashTargetPoint::StaticClass(), FoundActors);
-	
-	for (auto Actor : FoundActors)
-	{
-		ABountyDashTargetPoint* TestActor = Cast<ABountyDashTargetPoint>(Actor);
-		if (TestActor)
-		{
-			TargetArray.AddUnique(TestActor);
-		}
-	}
-	
-	auto SortPred = [](const AActor& A, const AActor& B)->bool
-	{
-		return(A.GetActorLocation().Y < B.GetActorLocation().Y);
-	};
-	TargetArray.Sort(SortPred);
-
-	/** ensure that the character starts the game in th middle most lane  */
-	CurrentLocation = ((TargetArray.Num() / 2) + (TargetArray.Num() % 2) - 1);
-
-	/** find floor actor and set the KillPoint var  */
-	TArray<AActor*> FloorsActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFloor::StaticClass(), FloorsActors);
-	
-	if (FloorsActors.Num() > 0)
-	{
-		if (FloorsActors.IsValidIndex(0))
-		{
-			AFloor* Floor = Cast<AFloor>(FloorsActors[0]);
-			if (Floor)
-			{
-				Killpoint = Floor->GetKillPoint();
-			}
-		}
-	}
+	BountyDashGameMode = Cast<ABountyDashGameMode>(GetWorld()->GetAuthGameMode());
+	check(BountyDashGameMode);
 }
 
 // Called every frame
@@ -120,38 +101,50 @@ void ABountyDashCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (TargetArray.Num() > 0)
+	/** Lerp to required location per tick  */
+	MovementThisTick(DeltaTime);
+
+	/** Handle bBeingPushed state  */
+	if (bBeingPushed)
+	{
+		float MovementSpeed = 0.f;
+
+		if (BountyDashGameMode)
+		{
+			MovementSpeed = BountyDashGameMode->GetInverseGameSpeed();
+
+			/** Pushing the character back  */
+			AddActorLocalOffset(FVector(MovementSpeed, 0.f, 0.f));
+		}
+	}
+
+	/** Handle bCanMagnet state */
+	if (bCanMagnet)
+	{
+		CoinMagnet();
+	}
+
+	/** Handle Game Over  */
+	if (GetActorLocation().X < KillPoint)
+	{
+		if (BountyDashGameMode)
+		{
+			BountyDashGameMode->GameOver();
+		}
+	}
+}
+
+void ABountyDashCharacter::MovementThisTick(float DeltaTime)
+{
+	if (TargetArray.Num() > 0 && TargetArray.IsValidIndex(CurrentLocation))
 	{
 		FVector TargetLocation = TargetArray[CurrentLocation]->GetActorLocation();
 		TargetLocation.Z = GetActorLocation().Z;
 		TargetLocation.X = GetActorLocation().X;
 		if (TargetLocation != GetActorLocation())
 		{
+			/** Y - axis lerp  */
 			SetActorLocation(FMath::Lerp(GetActorLocation(), TargetLocation, CharacterSpeed * DeltaTime));
-		}
-	}
-
-	if (bBeingPushed)
-	{
-		float MovementSpeed = 0.f;
-
-		if (ABountyDashGameMode* BountyDashGameMode = Cast<ABountyDashGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			MovementSpeed = BountyDashGameMode->GetInvGameSpeed();
-			AddActorLocalOffset(FVector(MovementSpeed, 0.f, 0.f));
-		}
-	}
-
-	if (CanMagnet)
-	{
-		CoinMagnet();
-	}
-
-	if (GetActorLocation().X < Killpoint)
-	{
-		if (ABountyDashGameMode* BountyDashGameMode = Cast<ABountyDashGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			BountyDashGameMode->GameOver();
 		}
 	}
 }
@@ -165,8 +158,60 @@ void ABountyDashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("BountyMoveLeft", IE_Pressed, this, &ABountyDashCharacter::MoveLeft);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-
+	
 	PlayerInputComponent->BindAction("Reset", IE_Pressed, this, &ABountyDashCharacter::Reset).bExecuteWhenPaused = true;
+}
+
+void ABountyDashCharacter::SetCharacterInTheMiddleLane()
+{
+	if (TargetArray.Num() > 0)
+	{
+		/** ensure that the character starts the game in th middle most lane  */
+		CurrentLocation = ((TargetArray.Num() / 2) + (TargetArray.Num() % 2) - 1);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("TargetArray is empty... Add more Target Points!"));
+	}
+}
+
+void ABountyDashCharacter::SetKillPoint()
+{
+	TArray<AActor*> FloorsActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFloor::StaticClass(), FloorsActors);
+
+	if (FloorsActors.Num() > 0)
+	{
+		if (FloorsActors.IsValidIndex(0))
+		{
+			AFloor* Floor = Cast<AFloor>(FloorsActors[0]);
+			if (Floor)
+			{
+				KillPoint = Floor->GetKillPoint();
+			}
+		}
+	}
+}
+
+void ABountyDashCharacter::FillAndSortTargetArray()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABountyDashTargetPoint::StaticClass(), FoundActors);
+
+	for (auto Actor : FoundActors)
+	{
+		ABountyDashTargetPoint* TestActor = Cast<ABountyDashTargetPoint>(Actor);
+		if (TestActor)
+		{
+			TargetArray.AddUnique(TestActor);
+		}
+	}
+
+	auto SortPred = [](const AActor& A, const AActor& B)->bool
+	{
+		return(A.GetActorLocation().Y < B.GetActorLocation().Y);
+	};
+	TargetArray.Sort(SortPred);
 }
 
 void ABountyDashCharacter::ScoreUp()
@@ -175,7 +220,7 @@ void ABountyDashCharacter::ScoreUp()
 	ABountyDashGameMode* BountyDashGameMode = Cast<ABountyDashGameMode>(GetWorld()->GetAuthGameMode());
 	if (BountyDashGameMode)
 	{
-		BountyDashGameMode->CharScoreUp(Score);
+		BountyDashGameMode->CharacterScoreUp(Score);
 	}
 
 	if (DingSound)
@@ -184,14 +229,13 @@ void ABountyDashCharacter::ScoreUp()
 	}
 }
 
-void ABountyDashCharacter::PowerUp(EPowerUp Type)
+void ABountyDashCharacter::PowerUp(EPowerUp PowerUpType)
 {
-	switch (Type)
-	{
-
+	switch (PowerUpType)
+	{	
+		/** SPEED  */
 		case EPowerUp::SPEED:
 		{	
-			ABountyDashGameMode* BountyDashGameMode = Cast<ABountyDashGameMode>(GetWorld()->GetAuthGameMode());
 			if (BountyDashGameMode)
 			{
 				BountyDashGameMode->ReduceGameSpeed();
@@ -199,19 +243,21 @@ void ABountyDashCharacter::PowerUp(EPowerUp Type)
 			break;
 		}
 
+		/** SMASH  */
 		case EPowerUp::SMASH:
 		{
-			CanSmash = true;
-			FTimerHandle newTimer;
-			GetWorld()->GetTimerManager().SetTimer(newTimer, this, &ABountyDashCharacter::StopSmash, SmashTime, false);
+			bCanSmash = true;
+			FTimerHandle NewTimer;
+			GetWorld()->GetTimerManager().SetTimer(NewTimer, this, &ABountyDashCharacter::StopSmash, SmashTime, false);
 			break;
 		}
 
+		/** MAGNET  */
 		case EPowerUp::MAGNET:
 		{
-			CanMagnet = true;
-			FTimerHandle newTimer;
-			GetWorld()->GetTimerManager().SetTimer(newTimer, this, &ABountyDashCharacter::StopMagnet, MagnetTime, false);
+			bCanMagnet = true;
+			FTimerHandle NewTimer;
+			GetWorld()->GetTimerManager().SetTimer(NewTimer, this, &ABountyDashCharacter::StopMagnet, MagnetTime, false);
 			break;
 		}
 
@@ -259,10 +305,18 @@ void ABountyDashCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedCompone
 		/** IsChildOf - Returns true if this struct either is class T, or is a child of class T. This will not crash on null structs */
 		if (OtherActor->GetClass()->IsChildOf(AObstacle::StaticClass()))
 		{
-			FVector vecBetween = OtherActor->GetActorLocation() - GetActorLocation();
-			float AngleBetween = FMath::Acos(FVector::DotProduct(vecBetween.GetSafeNormal(), GetActorForwardVector().GetSafeNormal()));
+			/**
+				We do this as the dot
+				product will return a ratio value that when parsed through an arccos function will
+				return the angle between the two vectors in radians. To change this value to degrees,
+				we multiply it by (180 / PI) as PI radians = 180 degrees. If the angle between vectors
+				is less than 60.0f , we can assume that the collision is fairly direct, so we then inform
+				the character of a collision with the obstacle by setting the bBeingPushed Boolean
+				to true .
+			*/
+			FVector VectorBetween = OtherActor->GetActorLocation() - GetActorLocation();
+			float AngleBetween = FMath::Acos(FVector::DotProduct(VectorBetween.GetSafeNormal(), GetActorForwardVector().GetSafeNormal()));
 			AngleBetween *= (180 / PI);
-			UE_LOG(LogTemp, Error, TEXT("Here"));
 			if (AngleBetween < 60.0f)
 			{
 				if (!bBeingPushed && HitObstacleSound)
@@ -271,10 +325,9 @@ void ABountyDashCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedCompone
 				}
 
 				AObstacle* Obstacle = Cast<AObstacle>(OtherActor);
-				if (Obstacle && CanSmash)
+				if (Obstacle && bCanSmash)
 				{
 					Obstacle->GetDestructable()->ApplyRadiusDamage(10000.f, GetActorLocation(), 10000.f, 10000.f, true);
-					UE_LOG(LogTemp, Error, TEXT("Your message"));
 				}
 				else
 				{
@@ -295,16 +348,6 @@ void ABountyDashCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent
 			bBeingPushed = false;
 		}
 	}
-}
-
-void ABountyDashCharacter::StopSmash()
-{
-	CanSmash = false;
-}
-
-void ABountyDashCharacter::StopMagnet()
-{
-	CanMagnet = false;
 }
 
 void ABountyDashCharacter::CoinMagnet()
@@ -330,7 +373,7 @@ void ABountyDashCharacter::CoinMagnet()
 		{
 			FVector CoinPosition = FMath::Lerp(Coin->GetActorLocation(), GetActorLocation(), 0.2f);
 			Coin->SetActorLocation(CoinPosition);
-			Coin->BeingPulled = true;
+			Coin->bIsBeingPulled = true;
 		}
 	}
 }

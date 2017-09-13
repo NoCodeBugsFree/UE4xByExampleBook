@@ -11,7 +11,7 @@ class UE4XBYEXAMPLEBOOK_API AObstacleSpawner : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+protected:
 
 	// Sets default values for this actor's properties
 	AObstacleSpawner();
@@ -22,30 +22,52 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-protected:
-	
+	/** Spawns the obstacle  */
 	void SpawnObstacle();
 
 public:	
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/** Templates for what to spawn  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<class AObstacle>> ObstaclesToSpawn;
 
+	/** Target Points  */
 	UPROPERTY()
-	TArray<class ABountyDashTargetPoint*> SpawnTargets;
+	TArray<class ABountyDashTargetPoint*> BountyDashTargetPoints;
 
+	/** Silly timer */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SpawnTimer;
+	float SpawnTimer = 1.5f;
 
+	/** Root  */
 	UPROPERTY()
 	class USceneComponent* Scene;
 
 private:
 
+	/** Find the floor and retrieve corresponding data */
+	void FindFloorAndRetrieveData();
+
+	/** Fill the SpawnTargets   */
+	void FillTheSpawnTargetsArray();
+
+	// -----------------------------------------------------------------------------------
+
+	/** Game Mode Reference  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	class ABountyDashGameMode* BountyDashGameMode;
+
+	/** Potential Floors in the World. Intended once instance of floor. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	TArray<class AFloor*> Floors;
+
+	/** Kill Point for spawned object */
 	float KillPoint;
 
+	/**  Spawn Point for spawned object */
 	float SpawnPoint;
 
+	/** Time from last spawn  */
 	float TimeSinceLastSpawn;
 	
 };
