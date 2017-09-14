@@ -14,16 +14,8 @@ class UE4XBYEXAMPLEBOOK_API ABossModeGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-public:
-
-
-
 protected:
 
 	ABossModeGameMode();
-
-
-private:
-	
 	
 };

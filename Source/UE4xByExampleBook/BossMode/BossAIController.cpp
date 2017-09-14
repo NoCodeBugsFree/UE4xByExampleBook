@@ -22,6 +22,7 @@ void ABossAIController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);
 	
+	/** if we have a valid character and BehaviorTree - init BlackBoard  */
 	ControlledCharacter = Cast<ABossCharacter>(InPawn);
 	if (ControlledCharacter && ControlledCharacter->BehaviorTree)
 	{
@@ -30,6 +31,7 @@ void ABossAIController::Possess(APawn* InPawn)
 			BlackboardComponent->InitializeBlackboard(*(ControlledCharacter->BehaviorTree->BlackboardAsset));
 		}
 
+		/** Start tree and init BB keys  */
 		BehaviorTreeComponent->StartTree(*ControlledCharacter->BehaviorTree);
 		if (BlackboardComponent)
 		{
@@ -45,25 +47,7 @@ void ABossAIController::Tick(float DeltaTime)
 
 	if (ControlledCharacter)
 	{
-		/** TODO remove tick garbage to special function */
-		float Health = ControlledCharacter->GetHealth();
-		if (Health < 33.f)
-		{
-			BossState = EBossState::BS_FINAL;
-			StopMovement();
-		}
-		else if (Health >= 33.f && Health < 66.f)
-		{
-			BossState = EBossState::BS_TURRET;
-			StopMovement();
-		}
-		else
-		{
-			BossState = EBossState::BS_FOLLOW;
-		}
-
-		BlackboardComponent->SetValue<UBlackboardKeyType_Enum>(BossStateBlackboardKey, (uint8)BossState);
-
+		/** if we should track character - rotate Boss towards the character  */
 		if (bIsTracking && Target)
 		{
 			FVector CharacterLocation = ControlledCharacter->GetActorLocation();
@@ -78,7 +62,9 @@ void ABossAIController::TrackToTarget()
 {
 	if (BlackboardComponent)
 	{
-		Target = Cast<ABossModeCharacter>(BlackboardComponent->GetValue<UBlackboardKeyType_Object>(TargetBlackboardKey));
+		/** Sets target to BB  */
+		//Target = Cast<ABossModeCharacter>(BlackboardComponent->GetValue<UBlackboardKeyType_Object>(TargetBlackboardKey));
+		Target = Cast<ABossModeCharacter>(BlackboardComponent->GetValueAsObject("TargetToFollow")); // without initialization
 		if (Target)
 		{
 			bIsTracking = true;
@@ -120,4 +106,29 @@ void ABossAIController::FireMissles()
 			}
 		}
 	} 
+}
+
+void ABossAIController::SetStateAccordingCurrentHealth()
+{
+	if (ControlledCharacter && BlackboardComponent)
+	{
+		float Health = ControlledCharacter->GetHealth();
+		if (Health < 33.f)
+		{
+			BossState = EBossState::BS_FINAL;
+			StopMovement();
+		}
+		else if (Health >= 33.f && Health < 66.f)
+		{
+			BossState = EBossState::BS_TURRET;
+			StopMovement();
+		}
+		else
+		{
+			BossState = EBossState::BS_FOLLOW;
+		}
+
+		/** sets the boss state to BB  */
+		BlackboardComponent->SetValue<UBlackboardKeyType_Enum>(BossStateBlackboardKey, (uint8)BossState);
+	}
 }

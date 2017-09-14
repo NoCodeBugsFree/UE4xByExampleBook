@@ -10,38 +10,42 @@
 ABossModeProjectile::ABossModeProjectile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	PrimaryActorTick.bCanEverTick = false;
+	
 	// Use a sphere as a simple collision representation
-	ProjCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	ProjCollision->InitSphereRadius(10.0f);
-	ProjCollision->BodyInstance.SetCollisionProfileName("BlockAll");
-	ProjCollision->OnComponentHit.AddDynamic(this, &ABossModeProjectile::OnHit);
-	ProjCollision->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
-	ProjCollision->CanCharacterStepUpOn = ECB_No;
-	SetRootComponent(ProjCollision);
-
+	ProjectileCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	ProjectileCollision->InitSphereRadius(10.0f);
+	ProjectileCollision->BodyInstance.SetCollisionProfileName("BlockAll");
+	ProjectileCollision->OnComponentHit.AddDynamic(this, &ABossModeProjectile::OnHit);
+	ProjectileCollision->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	ProjectileCollision->CanCharacterStepUpOn = ECB_No;
+	SetRootComponent(ProjectileCollision);
+	
 	OnDestroyed.AddDynamic(this, &ABossModeProjectile::OnDestoyedProjectile);
 
-	ProjMesh = CreateDefaultSubobject <UStaticMeshComponent>(TEXT("MeshComp"));
-	ProjMesh->SetupAttachment(ProjCollision);
-	ProjMesh->SetCollisionProfileName(TEXT("NoCollision"));
-	ProjParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleComp"));
-	ProjParticle->bAutoActivate = false;
-	ProjParticle->SetupAttachment(ProjCollision);
+	/** Mesh  */
+	ProjectileMesh = CreateDefaultSubobject <UStaticMeshComponent>(TEXT("MeshComp"));
+	ProjectileMesh->SetupAttachment(ProjectileCollision);
+	ProjectileMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
+	/** Particles  */
+	ProjectileParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleComp"));
+	ProjectileParticle->bAutoActivate = false;
+	ProjectileParticle->SetupAttachment(ProjectileCollision);
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
-	ProjMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjMovement->UpdatedComponent = ProjCollision;
-	ProjMovement->InitialSpeed = 3000.f;
-	ProjMovement->MaxSpeed = 3000.f;
-	ProjMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
+	ProjectileMovement->UpdatedComponent = ProjectileCollision;
+	ProjectileMovement->InitialSpeed = 3000.f;
+	ProjectileMovement->MaxSpeed = 3000.f;
+	ProjectileMovement->bRotationFollowsVelocity = true;
 
-	ProjMovement->bIsHomingProjectile = true;
-	ProjMovement->HomingAccelerationMagnitude = 10000.f;
+	ProjectileMovement->bIsHomingProjectile = true;
+	ProjectileMovement->HomingAccelerationMagnitude = 50000.f;
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
+	
 }
 
 // Called when the game starts or when spawned
@@ -68,16 +72,16 @@ void ABossModeProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* Other
 
 	if(OtherActor && !OtherActor->GetClass()->IsChildOf(this->StaticClass()))
 	{
-		ProjCollision->SetCollisionProfileName(TEXT("NoCollision"));
-		ProjCollision->bGenerateOverlapEvents = false;
-		ProjMesh->SetVisibility(false);
-		ProjParticle->Activate();
-		ProjParticle->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		ProjectileCollision->SetCollisionProfileName(TEXT("NoCollision"));
+		ProjectileCollision->bGenerateOverlapEvents = false;
+		ProjectileMesh->SetVisibility(false);
+		ProjectileParticle->Activate();
+		ProjectileParticle->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 	}
 }
 
-void ABossModeProjectile::OnDestoyedProjectile(AActor * OtherActor)
+void ABossModeProjectile::OnDestoyedProjectile(AActor* OtherActor)
 {
-
+	// =)
 }
 

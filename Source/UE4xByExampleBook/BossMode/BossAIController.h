@@ -11,6 +11,7 @@
  * 
  */
 
+/** Boss State according to health value  */
 UENUM(BlueprintType)
 enum class EBossState : uint8
 {
@@ -35,15 +36,17 @@ public:
 	virtual void Possess(APawn* InPawn) override;
 
 	virtual void Tick(float DeltaTime) override;
-
-	UBlackboardComponent* GetBlackboard() const { return BlackboardComponent; }
-
+	
+	
+	/** Sets the bIsTracking flag according to BB data  */
 	UFUNCTION(BlueprintCallable, Category = Behaviour)
 	void TrackToTarget();
 
+	/** Sets the bIsTracking flag to false and nullify the Enemy reference  */
 	UFUNCTION(BlueprintCallable, Category = Behaviour)
 	void StopTrack();
 	
+	/** Find Launch points near possessed character and attempts to spawn required amount of missiles  */
 	UFUNCTION(BlueprintCallable, Category = Behaviour)
 	void FireMissles();
 	
@@ -61,15 +64,38 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	class ABossCharacter* ControlledCharacter;
 
+	// -----------------------------------------------------------------------------------
+
+	/** Boss State Blackboard Key  */
 	FBlackboard::FKey BossStateBlackboardKey;
 	
+	/** Target Blackboard Key  */
+	FBlackboard::FKey TargetBlackboardKey;
+	
+	// -----------------------------------------------------------------------------------
+
+	/** Current Boss State  */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	EBossState BossState = EBossState::BS_FOLLOW;
-
-	FBlackboard::FKey TargetBlackboardKey;
-
+	
+	/** Enemy reference  */
 	class ABossModeCharacter* Target;
 
+	/** Flag that shows whether this AI is tacking the enemy or not  */
 	bool bIsTracking;
+
+
+	/** Sets the boss state  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void SetBossState(EBossState NewEBossState) { BossState = NewEBossState; }
+	
+public:
+
+	/** Calls every time when Boss takes damage, calls the SetBossState to accommodate current boss state  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void SetStateAccordingCurrentHealth();
+
+	/** Returns BlackboardComponent **/
+	FORCEINLINE class UBlackboardComponent* GetBlackboard() const { return BlackboardComponent; }
 
 };

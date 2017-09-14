@@ -13,21 +13,20 @@ class UE4XBYEXAMPLEBOOK_API ABossModeProjectile : public AActor
 	
 	/** Sphere collision component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	class USphereComponent* ProjCollision;
+	class USphereComponent* ProjectileCollision;
 
+	/** Impact particles   */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	class UParticleSystemComponent* ProjParticle;
+	class UParticleSystemComponent* ProjectileParticle;
 
+	/** Projectile Static Mesh  */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	class UStaticMeshComponent* ProjMesh;
+	class UStaticMeshComponent* ProjectileMesh;
 
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	class UProjectileMovementComponent* ProjMovement;
-
-public:	
+	class UProjectileMovementComponent* ProjectileMovement;
 	
-
 protected:
 
 	// Sets default values for this actor's properties
@@ -43,15 +42,16 @@ protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	/** wtf ?  */
 	UFUNCTION()
-	void OnDestoyedProjectile(AActor * OtherActor);
+	void OnDestoyedProjectile(AActor* OtherActor);
 
 public:	
 	
 	/** Returns Projectile Movement Component  */
-	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjMovement; }
+	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 
 	/** Returns Projectile Sphere Collision Component  */
-	FORCEINLINE class USphereComponent* GetSphereComponent() const { return ProjCollision; }
+	FORCEINLINE class USphereComponent* GetSphereComponent() const { return ProjectileCollision; }
 	
 };

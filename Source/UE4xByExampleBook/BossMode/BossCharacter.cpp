@@ -1,13 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BossCharacter.h"
-
+#include "BossAIController.h"
 
 // Sets default values
 ABossCharacter::ABossCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	ProjectileSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSceneComponent"));
+	ProjectileSceneComponent->SetupAttachment(RootComponent);
 
    /** These navigation agent properties are
 	*  used by the navigation system to accurately plot pathing points when generating
@@ -32,6 +35,19 @@ float ABossCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damage
 		}
 	}
 
+	SetStateAccordingCurrentHealth();
+
 	return ActualDamage;
+}
+
+void ABossCharacter::SetStateAccordingCurrentHealth()
+{
+	if ( GetController() )
+	{
+		if (ABossAIController* BossAIController = Cast<ABossAIController>(GetController()))
+		{
+			BossAIController->SetStateAccordingCurrentHealth();
+		}
+	}
 }
 

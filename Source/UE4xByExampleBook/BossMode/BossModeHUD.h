@@ -15,13 +15,13 @@ class UE4XBYEXAMPLEBOOK_API ABossModeHUD : public AHUD
 	GENERATED_BODY()
 	
 protected:
-
-	ABossModeHUD();
-
+	
+	/** Calls each frame to Draw the HUD  */
 	virtual void DrawHUD() override;
 
 private:
 	
+	/** Crosshair Texture  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	class UTexture2D* CrosshairTexture;
 	

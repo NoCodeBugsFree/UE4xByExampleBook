@@ -14,16 +14,19 @@ class UE4XBYEXAMPLEBOOK_API UBTService_AgroCheck : public UBTService
 {
 	GENERATED_BODY()
 	
-protected:
-
-	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-
 private:
+
+	UBTService_AgroCheck();
+
+	/** update next tick interval
+	* this function should be considered as const (don't modify state of object) if node is not instanced! */
+	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 	class UBehaviorTree* ThisTree;
 
 	class ABossAIController* ThisController;
-
+	
 	class ABossCharacter* ThisAICharacter;
 	
 };
+

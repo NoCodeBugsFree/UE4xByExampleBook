@@ -5,12 +5,13 @@
 #include "Camera/CameraComponent.h"
 #include "BossModeProjectile.h"
 #include "Engine.h"
+#include "BossCharacter.h"
 
 // Sets default values
 ABossModeCharacter::ABossModeCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
@@ -27,20 +28,23 @@ ABossModeCharacter::ABossModeCharacter()
 	FPCameraComponent->RelativeLocation = FVector(0, 0, 64.f);
 	FPCameraComponent->bUsePawnControlRotation = true;
 
+	/** Hands  */
 	FPMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	FPMesh->SetOnlyOwnerSee(true);
 	FPMesh->SetupAttachment(FPCameraComponent);
 	FPMesh->bCastDynamicShadow = false;
 	FPMesh->CastShadow = false;
 
+	/** Gun  */
 	FPGunMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
 	FPGunMesh->SetOnlyOwnerSee(true);// only the owning player will see mesh
 	FPGunMesh->bCastDynamicShadow = false;
 	FPGunMesh->CastShadow = false;
 	FPGunMesh->SetupAttachment(FPMesh, TEXT("GripPoint"));
 
-	ProjSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawn"));
-	ProjSpawn->SetupAttachment(FPGunMesh);
+	/** Projectile Spawn Point  */
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
+	ProjectileSpawnPoint->SetupAttachment(FPGunMesh);
 }
 
 // Called when the game starts or when spawned
@@ -62,19 +66,19 @@ void ABossModeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
-	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	InputComponent->BindAxis("MoveForward", this, &ABossModeCharacter::MoveForward);
-	InputComponent->BindAxis("MoveRight", this, &ABossModeCharacter::MoveRight);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAxis("MoveForward", this, &ABossModeCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ABossModeCharacter::MoveRight);
 
-	InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	InputComponent->BindAxis("TurnRate", this, &ABossModeCharacter::TurnAtRate);
-	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	InputComponent->BindAxis("LookUpRate", this, &ABossModeCharacter::LookUpAtRate);
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("TurnRate", this, &ABossModeCharacter::TurnAtRate);
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUpRate", this, &ABossModeCharacter::LookUpAtRate);
 
-	InputComponent->BindAction("Fire", IE_Pressed, this, &ABossModeCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABossModeCharacter::OnFire);
 
-	InputComponent->BindAction("Track", IE_Pressed, this, &ABossModeCharacter::OnTrack);
+	PlayerInputComponent->BindAction("Track", IE_Pressed, this, &ABossModeCharacter::OnTrack);
 }
 
 void ABossModeCharacter::MoveForward(float Val)
@@ -110,26 +114,20 @@ void ABossModeCharacter::LookUpAtRate(float Rate)
 void ABossModeCharacter::OnFire()
 {
 	// Attempt to fire Projectile
-	if (ProjectileClass != nullptr)
+	if (ProjectileClass && GetWorld() && ProjectileSpawnPoint)
 	{
-		if (GetWorld() != nullptr)
+		ABossModeProjectile* BossModeProjectile = GetWorld()->SpawnActor<ABossModeProjectile>(ProjectileClass, ProjectileSpawnPoint->GetComponentTransform());
+		if (BossModeProjectile)
 		{
-			if (ProjSpawn)
-			{
-				ABossModeProjectile* BossModeProjectile = GetWorld()->SpawnActor<ABossModeProjectile>(ProjectileClass, ProjSpawn->GetComponentTransform());
-				if (BossModeProjectile)
-				{
-					BossModeProjectile->GetProjectileMovement()->HomingTargetComponent = TrackingSceneComponent;
-				}
-			}
+			BossModeProjectile->GetProjectileMovement()->HomingTargetComponent = TrackingSceneComponent;
 		}
 	}
 }
 
 void ABossModeCharacter::OnTrack()
 {
-	FVector MousePos;
-	FVector MouseDir;
+	FVector MousePosition;
+	FVector MouseDirection;
 	FHitResult Hit;
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_GameTraceChannel2);
@@ -139,14 +137,27 @@ void ABossModeCharacter::OnTrack()
 	if (GEngine && GEngine->GameViewport && PlayerController)
 	{
 		FVector2D ScreenPos = GEngine->GameViewport->Viewport->GetSizeXY();
-		PlayerController->DeprojectScreenPositionToWorld(ScreenPos.X / 2.0f, ScreenPos.Y / 2.0f, MousePos, MouseDir);
-		MouseDir *= 100000.0f;
-		GetWorld()->LineTraceSingleByObjectType(Hit, MousePos, MouseDir, ObjectQueryParams);
+		PlayerController->DeprojectScreenPositionToWorld(ScreenPos.X / 2.0f, ScreenPos.Y / 2.0f, MousePosition, MouseDirection);
+		MouseDirection *= 100000.0f;
+		GetWorld()->LineTraceSingleByObjectType(Hit, MousePosition, MouseDirection, ObjectQueryParams);
 
 		if (Hit.bBlockingHit)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("TRACE HIT WITH %s"), *(Hit.GetActor()->GetName()));
-			TrackingSceneComponent = Cast<USceneComponent>(Hit.GetActor()->GetComponentByClass(USceneComponent::StaticClass()));
+			
+			/** sets the TrackingSceneComponent to required Boss SceneComponent [Book Way]  */
+			// TrackingSceneComponent = Cast<USceneComponent>(Hit.GetActor()->GetComponentByClass(USceneComponent::StaticClass()));
+
+			/** if we hit a boss  */
+			if (ABossCharacter* BossCharacter = Cast<ABossCharacter>(Hit.GetActor()))
+			{
+				/** and he have valid Projectile Scene Component  */
+				if (USceneComponent* ProjectileSceneComponent = BossCharacter->GetProjectileSceneComponent())
+				{
+					/** sets the TrackingSceneComponent to specified Projectile Scene Component */
+					TrackingSceneComponent = ProjectileSceneComponent;
+				}
+			}
 		}
 		else
 		{
@@ -155,4 +166,3 @@ void ABossModeCharacter::OnTrack()
 		}
 	}
 }
-

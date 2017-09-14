@@ -6,7 +6,7 @@
 ABossModeGameMode::ABossModeGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/BossMode/BP/BP_BossModeCharacter"));
+	ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/BossMode/BP/BP_Character"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 	
 }

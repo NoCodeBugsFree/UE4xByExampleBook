@@ -8,6 +8,15 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BehaviorTree/BehaviorTree.h"
 
+UBTService_AgroCheck::UBTService_AgroCheck()
+{
+	Interval = 1.1f;
+
+	RandomDeviation = 0.2f;
+
+	bCallTickOnSearchStart = true;
+}
+
 void UBTService_AgroCheck::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
@@ -36,9 +45,9 @@ void UBTService_AgroCheck::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
 	// FCollisionObjectQueryParams ObjectQuery(ECC_Pawn);
 	
 	FHitResult HitOut(ForceInit);
-
+	
 	DrawDebugSphere(ThisAICharacter->GetWorld(), ThisAICharacter->GetActorLocation(), 1500, 12, FColor::Red, false, 4.f);
-
+	
 	// Perform the sweep and check boolean return, we will only be checking for BMCharacter objects
 	FVector Start = ThisAICharacter->GetActorLocation();
 	FVector End = ThisAICharacter->GetActorLocation() + FVector(0.0f, 0.0f, 10.0f);
@@ -48,9 +57,13 @@ void UBTService_AgroCheck::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
 	if (bResult)
 	{
 		/** set received data to the BlackBoard  */
-		ThisController->GetBlackboard()->SetValueAsObject(TEXT("TargetToFollow"), HitOut.GetActor());
-		ThisController->GetBlackboard()->SetValueAsVector(TEXT("HomeLocation"), ThisAICharacter->GetActorLocation());
-		ThisController->GetBlackboard()->SetValueAsVector(TEXT("TargetLocation"), HitOut.GetActor()->GetActorLocation());
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("TargetToFollow"), HitOut.GetActor());
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(TEXT("HomeLocation"), ThisAICharacter->GetActorLocation());
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(TEXT("TargetLocation"), HitOut.GetActor()->GetActorLocation());
+		
+		//ThisController->GetBlackboard()->SetValueAsObject(TEXT("TargetToFollow"), HitOut.GetActor());
+		//ThisController->GetBlackboard()->SetValueAsVector(TEXT("HomeLocation"), ThisAICharacter->GetActorLocation());
+		//ThisController->GetBlackboard()->SetValueAsVector(TEXT("TargetLocation"), HitOut.GetActor()->GetActorLocation());
 
 		/** Start tracking the target character  */
 		ThisController->TrackToTarget();

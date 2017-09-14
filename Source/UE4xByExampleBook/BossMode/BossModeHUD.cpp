@@ -3,13 +3,6 @@
 #include "BossModeHUD.h"
 #include "Engine/Canvas.h"
 
-
-
-ABossModeHUD::ABossModeHUD()
-{
-
-}
-
 void ABossModeHUD::DrawHUD()
 {
 	Super::DrawHUD();
@@ -29,7 +22,7 @@ void ABossModeHUD::DrawHUD()
 		
 		// draw the Crosshair
 		// FCanvasTileItem - 'Tile' item can override size and UV 
-		FCanvasTileItem TileItem(CrosshairDrawPosition, CrosshairTexture->Resource, FLinearColor::White);
+		FCanvasTileItem TileItem(CrosshairDrawPosition, CrosshairTexture->Resource, FLinearColor(1.f, 1.f, 1.f, 0.5f));
 		TileItem.BlendMode = SE_BLEND_Translucent;
 
 		Canvas->DrawItem(TileItem);

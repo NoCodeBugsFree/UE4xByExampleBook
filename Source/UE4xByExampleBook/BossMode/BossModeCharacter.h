@@ -25,28 +25,21 @@ class UE4XBYEXAMPLEBOOK_API ABossModeCharacter : public ACharacter
 
 public:
 
-	// Sets default values for this character's properties
-	ABossModeCharacter();
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseTurnRate;
+	float BaseTurnRate = 45.0f;
 	
 	// Base Lookup/Down rate in deg/sec
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseLookUpRate;
+	float BaseLookUpRate = 45.0f;
 
 	// Projectile class to use
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class ABossModeProjectile> ProjectileClass;
-
-	// Projectile Spawn
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA")
-	class USceneComponent* ProjSpawn;
-
+	
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	USceneComponent* TrackingSceneComponent;
+	// Sets default values for this character's properties
+	ABossModeCharacter();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -73,11 +66,20 @@ protected:
 	* @param Rate this is the normalized rate, 1.0 means full turn rate
 	*/
 	void LookUpAtRate(float Rate);
-
-
-	/** Fires a projectile. */
+	
+	/** Fires a projectile and sets TrackingSceneComponent */
 	void OnFire();
 
+	/** Attempt to setup TrackingSceneComponent to valid value if we successfully LineTraceSingleByObjectType the Boss character */
 	void OnTrack();
+
+
+	/** Projectile Spawn  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA")
+	class USceneComponent* ProjectileSpawnPoint;
+	
+	/** HomingTargetComponent - attract point for this projectile  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	class USceneComponent* TrackingSceneComponent;
 	
 };
