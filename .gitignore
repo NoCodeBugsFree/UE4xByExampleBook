@@ -1,7 +1,9 @@
 Binaries
+Build/*
 DerivedDataCache
 Intermediate
 Saved
+Content/AnimStarterPack
 .vs/
 *.VC.db
 *.opensdf

@@ -23,7 +23,6 @@ EBTNodeResult::Type UBTTaskNode_RandomMoveTo::ExecuteTask(UBehaviorTreeComponent
 	FNavLocation RandomPoint;
 	if (GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(ThisController->GetPawn()->GetActorLocation(), 5000.0f, RandomPoint))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Succeeded"));
 		ThisController->MoveTo(RandomPoint.Location);
 		return EBTNodeResult::Succeeded;
 	}

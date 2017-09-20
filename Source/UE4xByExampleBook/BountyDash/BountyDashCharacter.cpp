@@ -59,6 +59,7 @@ ABountyDashCharacter::ABountyDashCharacter()
 	FollowCamera->SetupAttachment(CameraBoom);
 
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	// ERROR ! AttachToComponent - spawns build errors! use SetupAttachment instead !
 	//FollowCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetIncludingScale, USpringArmComponent::SocketName);
 
 	// Rotational change to make the camera look down slightly

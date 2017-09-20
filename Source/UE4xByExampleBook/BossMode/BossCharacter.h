@@ -28,7 +28,7 @@ protected:
 private:
 
 	/** Character's health  */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	float Health = 100.f;
 	
 	/*   Scene Component for attract a projectile */
