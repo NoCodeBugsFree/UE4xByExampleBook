@@ -34,14 +34,14 @@ class UE4XBYEXAMPLEBOOK_API AGladiator : public ACharacter
 
 	/** Base Jump velocity  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	float JumppingVelocity = 600.f;
+	float JumpingVelocity = 600.f;
 
 	/** Is the player dead or not  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	bool IsStillAlive = true;
 
 	/** is the player attacking right now?  */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	bool IsAttacking = false;
 
 	/** the index of the current active weapon.  */
@@ -61,16 +61,30 @@ class UE4XBYEXAMPLEBOOK_API AGladiator : public ACharacter
 	float TotalHealth = 100.f;
 
 	/**  Current character's health */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	float CurrentHealth = 100.f;
 
 	/**  the current weapon attacking range */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	float AttackRange = 25.f;
 
-public:
-	
+	/**  the current collected coins amount */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	float CollectedCoins = 0.f;
 
+public:
+
+	/** the attack effect on health  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void OnChangeHealthByAmount(float UsedAmount);
+
+	/** Called when we collecting a pickup  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void OnCollectPickup();
+
+	/** Calls to add a specified amount of coins  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void AddCoins(float Amount) { CollectedCoins += Amount; }
 
 protected:
 	
@@ -91,10 +105,6 @@ protected:
 	/** Enable or disable inputs  */
 	UFUNCTION(BlueprintCallable, Category = "AAA")
 	void OnSetPlayerController(bool Status);
-
-	/** the attack effect on health  */
-	UFUNCTION(BlueprintCallable, Category = "AAA")
-	void OnChangeHealthByAmount(float UsedAmount);
 
 	/** A method that holds some procedurals after the player has done an attack.  */
 	UFUNCTION(BlueprintCallable, Category = "AAA")

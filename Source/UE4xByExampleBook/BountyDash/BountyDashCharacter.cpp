@@ -23,11 +23,6 @@ ABountyDashCharacter::ABountyDashCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	/** Mesh */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMesh(TEXT("SkeletalMesh'/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin'"));
-	if (SkeletalMesh.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(SkeletalMesh.Object);
-	}
 
 	// Rotate and position the mesh so it sits in the capsule component properly
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()));

@@ -2,6 +2,8 @@
 
 #include "Gladiator.h"
 #include "Engine/DataTable.h"
+#include "PickupBase.h"
+#include "CoinPickup.h"
 
 /**  
 
@@ -24,7 +26,7 @@ AGladiator::AGladiator()
 	/** Character moves in the direction of input...  */
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
-	GetCharacterMovement()->JumpZVelocity = JumppingVelocity;
+	GetCharacterMovement()->JumpZVelocity = JumpingVelocity;
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
@@ -85,6 +87,8 @@ void AGladiator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	InputComponent->BindAction("Collect", IE_Pressed, this, &AGladiator::OnCollectPickup);
+
 	InputComponent->BindAction("Attack", IE_Released, this, &AGladiator::OnAttack);
 
 	InputComponent->BindAction("ChangeWeapon", IE_Released, this, &AGladiator::OnChangeWeapon);
@@ -107,14 +111,15 @@ void AGladiator::OnSetPlayerController(bool Status)
 
 void AGladiator::OnChangeHealthByAmount(float UsedAmount)
 {
-	TotalHealth -= UsedAmount;
+	// TotalHealth -= UsedAmount; // ? WTF ?
+	CurrentHealth -= UsedAmount;
 
 	/**  there is a call for an internal function being made using the method
 		CallFunctionByNameWithArguments ; this means that the C++ code is going to call
 		the blueprint function.
 	*/
 	FOutputDeviceNull ar;
-	this->CallFunctionByNameWithArguments(TEXT("ApplyGetDamageEffect"), ar, NULL, true);
+	CallFunctionByNameWithArguments(TEXT("ApplyGetDamageEffect"), ar, NULL, true);
 
 	/** Command line. 
 	
@@ -137,6 +142,24 @@ void AGladiator::OnChangeHealthByAmount(float UsedAmount)
 	where we will implement the logic for the ApplyGetDamageEffect method.
 	
 	*/
+}
+
+void AGladiator::OnCollectPickup()
+{
+	// Lets make a temp array to hold the overlapped coins
+	TArray<AActor*> CollectedPickups;
+
+	GetCapsuleComponent()->GetOverlappingActors(CollectedPickups);
+
+	for (AActor*& TestActor : CollectedPickups)
+	{
+		APickupBase* Pickup = Cast<APickupBase>(TestActor);
+		if (Pickup && !Pickup->IsPendingKill() && Pickup->IsActive())
+		{
+			/** here will be call whatever derived class (from APickupBase) overridden function, e.g. ACoinPickup::OnGetCollected()   */
+			Pickup->OnGetCollected(this);
+		}
+	}
 }
 
 void AGladiator::MoveForward(float Value)
