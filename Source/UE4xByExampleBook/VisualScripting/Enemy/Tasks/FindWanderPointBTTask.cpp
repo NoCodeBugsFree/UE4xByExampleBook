@@ -3,6 +3,7 @@
 #include "FindWanderPointBTTask.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "VisualScripting/Enemy/VSEnemyAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UFindWanderPointBTTask::UFindWanderPointBTTask()
 {

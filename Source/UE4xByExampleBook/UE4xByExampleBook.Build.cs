@@ -7,8 +7,11 @@ public class UE4xByExampleBook : ModuleRules
 	public UE4xByExampleBook(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PowerUpPlugin", "AIModule", "GameplayTasks", "Paper2D", "UMG" });
+
+        MinFilesUsingPrecompiledHeaderOverride = 1;
+        bFasterWithoutUnity = true;
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PowerUpPlugin", "AIModule", "GameplayTasks", "Paper2D", "UMG" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Paper2D", "Slate", "SlateCore" });
 

@@ -3,6 +3,7 @@
 #include "AmmoPickup.h"
 #include "VSCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 AAmmoPickup::AAmmoPickup()
 {

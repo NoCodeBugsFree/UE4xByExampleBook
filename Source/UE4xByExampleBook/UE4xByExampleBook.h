@@ -3,13 +3,4 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Engine.h"
-///** This is a good place to
-//  * include utility functions you wish all objects to have access to. 
-//  */
-//
-//template<typename T>
-//T* GetCustomGameMode(UWorld* WorldContext)
-//{
-//	return Cast<T>(WorldContext->GetAuthGameMode());
-//}
+#include "Engine.h"

@@ -5,6 +5,8 @@
 #include "NSGameState.h"
 #include "NSGameMode.h"
 #include "NSPlayerState.h"
+#include "Engine/Canvas.h"
+#include "Kismet/GameplayStatics.h"
 
 void ANSHUD::DrawHUD()
 {

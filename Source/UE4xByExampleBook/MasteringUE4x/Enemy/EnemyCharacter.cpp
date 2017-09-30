@@ -7,7 +7,8 @@
 #include "Perception/PawnSensingComponent.h"
 #include "MasteringUE4x/Gladiator.h"
 #include "BearAnimInstance.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -15,16 +16,16 @@ AEnemyCharacter::AEnemyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
-	static ConstructorHelpers::FObjectFinder<UBlueprint> BPAIControllerClass(TEXT("/Game/MasteringUE4x/BP/Enemy/BP_BearAIController"));
+	static ConstructorHelpers::FObjectFinder<class UBlueprint> BPAIControllerClass(TEXT("/Game/MasteringUE4x/BP/Enemy/BP_BearAIController"));
 	if (BPAIControllerClass.Succeeded())
 	{
-		AIControllerClass = (UClass*)BPAIControllerClass.Object->GeneratedClass;
+		AIControllerClass = BPAIControllerClass.Object->GeneratedClass;
 	}
-
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BT(TEXT("/Game/MasteringUE4x/BP/Enemy/BearBT"));
+	
+	static ConstructorHelpers::FObjectFinder<class UObject> BT(TEXT("/Game/MasteringUE4x/BP/Enemy/BearBT"));
 	if (BT.Succeeded())
 	{
-		BehaviorTree = (UBehaviorTree*)BT.Object;
+		BehaviorTree = Cast<UBehaviorTree>(BT.Object);
 	}
 	
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;

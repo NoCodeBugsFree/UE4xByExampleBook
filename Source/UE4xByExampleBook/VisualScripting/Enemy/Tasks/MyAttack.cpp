@@ -2,6 +2,9 @@
 
 #include "MyAttack.h"
 #include "VisualScripting/VSCharacter.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "VisualScripting/Enemy/VSEnemyCharacter.h"
+#include "AIController.h"
 
 UMyAttack::UMyAttack()
 {

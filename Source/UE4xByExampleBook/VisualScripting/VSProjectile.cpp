@@ -2,6 +2,7 @@
 
 #include "VSProjectile.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
 AVSProjectile::AVSProjectile()

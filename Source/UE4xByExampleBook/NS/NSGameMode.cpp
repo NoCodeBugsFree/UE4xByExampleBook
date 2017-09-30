@@ -7,6 +7,7 @@
 #include "NSPlayerState.h"
 #include "NSHUD.h"
 #include "NSGameState.h"
+#include "EngineUtils.h"
 
 /** This bool has been declared as static so that its state
 	will persist through server travels to new maps.  

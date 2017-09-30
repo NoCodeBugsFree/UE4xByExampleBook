@@ -20,10 +20,10 @@ public:
 
 	/** Transient Property is transient: shouldn't be saved, zero-filled at load time.  */
 	UPROPERTY(Transient)
-	UBlackboardComponent* BlackboardComp;
+	class UBlackboardComponent* BlackboardComp;
 
 	UPROPERTY(Transient)
-	UBehaviorTreeComponent* BehaviorComp;
+	class UBehaviorTreeComponent* BehaviorComp;
 
 	/** returns the enemy reference  */
 	UFUNCTION(BlueprintCallable, Category = "AAA")

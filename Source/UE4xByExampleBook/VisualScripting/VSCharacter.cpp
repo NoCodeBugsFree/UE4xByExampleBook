@@ -7,6 +7,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "VSGameMode.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values

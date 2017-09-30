@@ -8,6 +8,9 @@
 #include "VisualScripting/VSProjectile.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "VisualScripting/VSCharacter.h"
+#include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
 
 // Sets default values
 AVSEnemyCharacter::AVSEnemyCharacter()
@@ -16,14 +19,14 @@ AVSEnemyCharacter::AVSEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	/** set UBehaviorTree  */
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BT(TEXT("/Game/BP_VisualScripting/BP/Enemy/VSEnemyBT"));
+	static ConstructorHelpers::FObjectFinder<UObject> BT(TEXT("/Game/BP_VisualScripting/BP/Enemy/VSEnemyBT"));
 	if (BT.Succeeded())
 	{
-		BehaviorTree = BT.Object;
+		BehaviorTree =  Cast<UBehaviorTree>(BT.Object);
 	}
 
 	/** set AI Controller */
-	static ConstructorHelpers::FClassFinder<AController> BPAIControllerClass(TEXT("/Game/BP_VisualScripting/BP/Enemy/BP_VSEnemyAIController"));
+	static ConstructorHelpers::FClassFinder<class AController> BPAIControllerClass(TEXT("/Game/BP_VisualScripting/BP/Enemy/BP_VSEnemyAIController"));
 	if (BPAIControllerClass.Class != NULL)
 	{
 		AIControllerClass = BPAIControllerClass.Class;
@@ -100,7 +103,7 @@ float AVSEnemyCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 			bIsDead = true;
 
 			/** disable capsule collision  */
-			GetCapsuleComponent()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+			GetCapsuleComponent()->SetCollisionProfileName("NoCollision");
 
 			/** disable hand damage spheres  */
 			SetCanAttack(false);

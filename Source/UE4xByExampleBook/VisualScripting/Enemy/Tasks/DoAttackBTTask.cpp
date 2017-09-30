@@ -2,6 +2,8 @@
 
 #include "DoAttackBTTask.h"
 #include "VisualScripting/VSCharacter.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "AIController.h"
 
 UDoAttackBTTask::UDoAttackBTTask()
 {

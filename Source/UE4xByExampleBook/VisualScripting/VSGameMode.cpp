@@ -7,6 +7,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "VSSaveGame.h"
+#include "EngineUtils.h"
 
 void AVSGameMode::BeginPlay()
 {

@@ -23,6 +23,8 @@ public:
 	/** Behavior Tree  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	class UBehaviorTree* BehaviorTree;
+	
+	//int32 Apples = 32;
 
 	/** Pawn Sensing Component  */
 	UPROPERTY(VisibleAnywhere, Category = AI)

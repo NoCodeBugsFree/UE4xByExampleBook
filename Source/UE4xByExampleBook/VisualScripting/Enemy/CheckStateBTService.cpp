@@ -2,6 +2,8 @@
 
 #include "CheckStateBTService.h"
 #include "VSEnemyCharacter.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "AIController.h"
 
 UCheckStateBTService::UCheckStateBTService()
 {

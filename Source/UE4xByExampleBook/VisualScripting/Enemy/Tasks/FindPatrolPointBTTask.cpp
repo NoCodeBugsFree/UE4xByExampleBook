@@ -2,6 +2,8 @@
 
 #include "FindPatrolPointBTTask.h"
 #include "VisualScripting/Enemy/VSEnemyCharacter.h"
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UFindPatrolPointBTTask::UFindPatrolPointBTTask()
 {

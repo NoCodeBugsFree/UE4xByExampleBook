@@ -4,7 +4,12 @@
 #include "Engine/DataTable.h"
 #include "PickupBase.h"
 #include "CoinPickup.h"
-
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Core.h"
 /**  
 
 */
