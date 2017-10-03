@@ -18,14 +18,6 @@ class UE4XBYEXAMPLEBOOK_API AVSEnemyCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-public:
-
-	/** Behavior Tree  */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	class UBehaviorTree* BehaviorTree;
-	
-	//int32 Apples = 32;
-
 	/** Pawn Sensing Component  */
 	UPROPERTY(VisibleAnywhere, Category = AI)
 	class UPawnSensingComponent* PawnSensingComponent;
@@ -37,7 +29,21 @@ public:
 	/** Sphere component at right paw to inflict damage to player  */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* RightHandDamageTrigger;
-	
+
+	/** Health bar reference  */
+	UPROPERTY()
+	class UMyUserWidget* HealthBarWidget;
+
+public:
+
+	/** sets the health bar widget reference to update it when takes damage  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void SetHealthBarWidget(class UMyUserWidget* HealthBarWidgetToSet);
+
+	/** Behavior Tree  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	class UBehaviorTree* BehaviorTree;
+
 protected:
 
 	// Sets default values for this character's properties
@@ -59,7 +65,6 @@ private:
 	/** calls when hand trigger sphere was overlapped to inflict damage to character  */
 	UFUNCTION()
 	void OnHandTriggerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
 	
 	/** simple change body and eye color according to health  */
 	UFUNCTION(BlueprintCallable, Category = "AAA")
@@ -73,6 +78,9 @@ private:
 	UFUNCTION()
 	void OnHearNoise(APawn* PawnInstigator, const FVector& Location, float Volume);
 
+	/** calls when enemy takes damage to update health bar  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void UpdateHealthBarWidget();
 	
 
 	/** patrol points for this AI Character  */

@@ -20,10 +20,6 @@ class UE4XBYEXAMPLEBOOK_API AGladiator : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
-	/** The sprite used to draw effect, better and more controllable than using the HUD or Textures  */
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	//class UPaperSpriteComponent* EffectSprite;
-
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate.  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
 	float BaseTurnRate = 45.f;
@@ -54,7 +50,7 @@ class UE4XBYEXAMPLEBOOK_API AGladiator : public ACharacter
 
 	/** to hold the active instance of the game tables  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	class UDataTable* TablesInstance;
+	class AGameDataTables* TablesInstance;
 
 	/**  Total character's health */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
@@ -70,7 +66,7 @@ class UE4XBYEXAMPLEBOOK_API AGladiator : public ACharacter
 
 	/**  the current collected coins amount */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	float CollectedCoins = 0.f;
+	int32 CollectedCoins = 0;
 
 public:
 
@@ -84,7 +80,11 @@ public:
 
 	/** Calls to add a specified amount of coins  */
 	UFUNCTION(BlueprintCallable, Category = "AAA")
-	void AddCoins(float Amount) { CollectedCoins += Amount; }
+	void AddCoins(int32 Amount);
+
+	/** Calls to add a specified amount of coins  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void GetHUDData(float& HealthPercent, FText& CoinsText) const;
 
 protected:
 	
@@ -93,13 +93,13 @@ protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 	// -----------------------------------------------------------------------------------
 
 	/** Enable or disable inputs  */
@@ -140,11 +140,33 @@ protected:
 	/** method that is responsible for applying the camera look - up rate to the follow camera.  */
 	void LookUpAtRate(float Rate);
 
+	/** find our GameDataTable object in the world and  Fetch All Tables from it */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void SetupGameDataTables();
+
+	/** calls to create HUD widget BP */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void CreateHUD();
+
+	/** The game UI widget blueprint that been designed in UMG editor  */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI", Meta = (BleprintProtected = "true"))
+	TSubclassOf<class UUserWidget> GameUIWidget;
+
+	/** The in game instance of the UI  */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI", Meta = (BleprintProtected = "true"))
+	class UUserWidget* GameUIInstance;
+	
 private:
 
+	/** calls to load game from slot when we begin play */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void LoadGameFromSlot();
 
+	/** calls to save game to slot when we take damage or collect coin  */
+	UFUNCTION(BlueprintCallable, Category = "AAA")
+	void SaveGameToSlot();
 
-public:	
+public:
 	
 	/** Return if the player dead or alive  */
 	UFUNCTION(BlueprintCallable, Category = "Player Attributes")

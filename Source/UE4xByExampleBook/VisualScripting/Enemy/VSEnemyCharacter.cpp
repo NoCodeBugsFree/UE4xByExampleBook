@@ -11,6 +11,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "VisualScripting/Enemy/UI/MyUserWidget.h"
 
 // Sets default values
 AVSEnemyCharacter::AVSEnemyCharacter()
@@ -55,13 +56,12 @@ AVSEnemyCharacter::AVSEnemyCharacter()
 	RightHandDamageTrigger->SetupAttachment(GetMesh(), "hand_rt");
 	RightHandDamageTrigger->ShapeColor = RedColor;
 	RightHandDamageTrigger->bGenerateOverlapEvents = false;
-
+	
 	/** intended to spawn in not attacking state  */
 	bIsAttacking = false;
 
 	/** and alive  */
 	bIsDead = false;
-
 }
 
 // Called when the game starts or when spawned
@@ -93,6 +93,9 @@ float AVSEnemyCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 		EnemyHealth -= ActualDamage;
 		EnemyHealth = FMath::Clamp(EnemyHealth, 0.f, 100.f);
 
+		/**   */
+		UpdateHealthBarWidget();
+		
 		/** change color according to current health value  */
 		ChangeColor();
 		
@@ -127,6 +130,14 @@ float AVSEnemyCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 		}
 	}
 	return ActualDamage;
+}
+
+void AVSEnemyCharacter::UpdateHealthBarWidget()
+{
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->UpdateHUD(EnemyHealth / 100.f);
+	}
 }
 
 void AVSEnemyCharacter::OnHandTriggerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -252,4 +263,12 @@ void AVSEnemyCharacter::Attack()
 void AVSEnemyCharacter::StopAttackAnimation()
 {
 	bIsAttacking = false;
+}
+
+void AVSEnemyCharacter::SetHealthBarWidget(class UMyUserWidget* HealthBarWidgetToSet)
+{
+	if (HealthBarWidgetToSet)
+	{
+		HealthBarWidget = HealthBarWidgetToSet;
+	}
 }

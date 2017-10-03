@@ -44,7 +44,7 @@ protected:
 	virtual void Possess(APawn* InPawn) override;
 
 	/** calls in posses to initialize blackboard and start behavior tree  */
-	void InitBlackBoardandStartBehaviorTree(APawn* InPawn);
+	void InitBlackBoardAndStartBehaviorTree(APawn* InPawn);
 
 	/** State entered when inactive (no possessed pawn, not spectating, etc). */
 	virtual void BeginInactiveState() override;

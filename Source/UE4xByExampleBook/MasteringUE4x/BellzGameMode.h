@@ -13,8 +13,9 @@ UCLASS()
 class UE4XBYEXAMPLEBOOK_API ABellzGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+protected:
+
+	ABellzGameMode();
+
 };

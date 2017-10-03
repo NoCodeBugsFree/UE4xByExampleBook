@@ -11,6 +11,7 @@ void ACoinPickup::OnGetCollected_Implementation(AActor* OtherActor)
 	if (AGladiator* Gladiator = Cast<AGladiator>(OtherActor))
 	{
 		Gladiator->AddCoins(CoinValue);
+
 		SetActive(false);
 	}
 	

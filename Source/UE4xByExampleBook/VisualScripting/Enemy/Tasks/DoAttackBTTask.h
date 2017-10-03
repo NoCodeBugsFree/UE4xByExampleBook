@@ -24,7 +24,7 @@ private:
 
 	/** Damage per hit */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	float Damage = 30.f;
+	float Damage = 33.f;
 		
 	/** starts this task, should return Succeeded, Failed or InProgress
 	*  (use FinishLatentTask() when returning InProgress)

@@ -10,13 +10,24 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Core.h"
-/**  
-
-*/
+#include "ConstructorHelpers.h"
+#include "Blueprint/UserWidget.h"
+#include "UI/InGameUI.h"
+#include "BellzSaveGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameDataTables.h"
+#include "EngineUtils.h"
 
 // Sets default values
 AGladiator::AGladiator()
 {
+	/** sets Game UI Widget BP  */
+	static ConstructorHelpers::FClassFinder<UUserWidget> GameUIWidgetClass(TEXT("/Game/MasteringUE4x/BP/UI/BP_InGameUI"));
+	if (GameUIWidgetClass.Class != NULL)
+	{
+		GameUIWidget = GameUIWidgetClass.Class;
+	}
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -48,10 +59,6 @@ AGladiator::AGladiator()
 
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
-	/**   */
-	//EffectSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ClawEffect"));
-	//EffectSprite->AttachTo(CameraBoom);
 	
 	// by default the inputs should be enabled, in case there is something need to be tested
 	OnSetPlayerController(true);
@@ -61,19 +68,18 @@ AGladiator::AGladiator()
 void AGladiator::BeginPlay()
 {
 	Super::BeginPlay();
+
+	/** creates in game HUD Widget BP  */
+	CreateHUD();
 	
-	/**  WTF ? 
-	for (TActorIterator<UDataTable> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	{
-		if (ActorItr)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, ActorItr->GetName());
-			TablesInstance = *ActorItr;
-			TablesInstance->OnFetchAllTables();
-		}
-	}
-	*/
+	/** loads the game */
+	LoadGameFromSlot();
+	
+	/** find our GameDataTable object in the world and  Fetch All Tables from it */
+	SetupGameDataTables();
+
 }
+
 
 // Called every frame
 void AGladiator::Tick(float DeltaTime)
@@ -147,6 +153,39 @@ void AGladiator::OnChangeHealthByAmount(float UsedAmount)
 	where we will implement the logic for the ApplyGetDamageEffect method.
 	
 	*/
+
+
+	/** save current health value to slot   */
+	SaveGameToSlot();
+}
+
+void AGladiator::SaveGameToSlot()
+{
+	if (UBellzSaveGame* BellzSaveGame = Cast<UBellzSaveGame>(UGameplayStatics::CreateSaveGameObject(UBellzSaveGame::StaticClass())))
+	{
+		/** Change the health value of the save class to match the current health value of the gladiator  */
+		BellzSaveGame->PlayerHealth = CurrentHealth;
+		BellzSaveGame->CollectedCoins = CollectedCoins;
+
+		/**  Store the health value to the save file */
+		UGameplayStatics::SaveGameToSlot(BellzSaveGame, BellzSaveGame->SlotName, BellzSaveGame->PlayerIndex);
+	}
+}
+
+void AGladiator::LoadGameFromSlot()
+{
+	if (UBellzSaveGame* BellzLoadGameInstance = Cast<UBellzSaveGame>(UGameplayStatics::CreateSaveGameObject(UBellzSaveGame::StaticClass())))
+	{
+		BellzLoadGameInstance = Cast<UBellzSaveGame>(UGameplayStatics::LoadGameFromSlot(BellzLoadGameInstance->SlotName,
+			BellzLoadGameInstance->PlayerIndex));
+
+		// get the needed value and store it in a local variable
+		if (BellzLoadGameInstance->PlayerHealth > 0)
+		{
+			CurrentHealth = BellzLoadGameInstance->PlayerHealth;
+			CollectedCoins = BellzLoadGameInstance->CollectedCoins;
+		}
+	}
 }
 
 void AGladiator::OnCollectPickup()
@@ -165,6 +204,27 @@ void AGladiator::OnCollectPickup()
 			Pickup->OnGetCollected(this);
 		}
 	}
+}
+
+void AGladiator::AddCoins(int32 Amount)
+{
+	CollectedCoins += Amount;
+
+	/** if we have a HUD widget bp  */
+	if(UInGameUI* InGameUI = Cast<UInGameUI>(GameUIInstance))
+	{
+		/** play screen anim  */
+		InGameUI->PlayCoinAnimation();
+	}
+}
+
+void AGladiator::GetHUDData(float& HealthPercent, FText& CoinsText) const
+{
+	/** Health Percent  */
+	HealthPercent = CurrentHealth / 100.f;
+	
+	/**  Coins  */
+	CoinsText = FText::FromString(FString::Printf(TEXT("%d"), CollectedCoins));
 }
 
 void AGladiator::MoveForward(float Value)
@@ -257,4 +317,26 @@ void AGladiator::LookUpAtRate(float Rate)
 	}
 }
 
+void AGladiator::CreateHUD()
+{
+	if (GameUIWidget)
+	{
+		GameUIInstance = CreateWidget<UUserWidget>(GetWorld(), GameUIWidget);
+		if (GameUIInstance)
+		{
+			GameUIInstance->AddToViewport();
+		}
+	}
+}
 
+void AGladiator::SetupGameDataTables()
+{
+	for (TActorIterator<AGameDataTables> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		if (ActorItr)
+		{
+			TablesInstance = *ActorItr;
+			TablesInstance->OnFetchAllTables();
+		}
+	}
+}

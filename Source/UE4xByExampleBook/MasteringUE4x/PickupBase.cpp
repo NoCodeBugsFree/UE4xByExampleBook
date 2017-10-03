@@ -20,6 +20,6 @@ APickupBase::APickupBase()
 
 void APickupBase::OnGetCollected_Implementation(AActor* OtherActor)
 {
-	UE_LOG(LogTemp, Error, TEXT(" APickupBase::OnGetCollected_Implementation(). "));
+	// UE_LOG(LogTemp, Error, TEXT(" APickupBase::OnGetCollected_Implementation(). "));
 }
 

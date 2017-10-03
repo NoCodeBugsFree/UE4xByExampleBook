@@ -23,10 +23,10 @@ void AEnemyAIController::Possess(APawn* InPawn)
 	Super::Possess(InPawn);
 
 	/** calls to initialize blackboard and start behavior tree  */
-	InitBlackBoardandStartBehaviorTree(InPawn);
+	InitBlackBoardAndStartBehaviorTree(InPawn);
 }
 
-void AEnemyAIController::InitBlackBoardandStartBehaviorTree(APawn* InPawn)
+void AEnemyAIController::InitBlackBoardAndStartBehaviorTree(APawn* InPawn)
 {
 	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(InPawn);
 	if (EnemyCharacter && EnemyCharacter->BehaviorTree && EnemyCharacter->BehaviorTree->BlackboardAsset)
@@ -118,7 +118,7 @@ void AEnemyAIController::OnSearchForEnemy()
 				{
 					if (TestPawn && TestPawn->GetIsStillAlive())
 					{
-						UE_LOG(LogClass, Log, TEXT(" ===================>>>>> ENEMY SEEN %s "), *GetNameSafe(*It));
+						// UE_LOG(LogClass, Log, TEXT(" ===================>>>>> ENEMY SEEN %s "), *GetNameSafe(*It));
 
 						const float DistanceSquared = (TestPawn->GetActorLocation() - TempLocation).SizeSquared();
 						if (DistanceSquared < BestDistSquared)
@@ -135,6 +135,6 @@ void AEnemyAIController::OnSearchForEnemy()
 	{
 		// We saw someone, so set him as target.
 		SetEnemy(PlayerPawn);
-		UE_LOG(LogClass, Log, TEXT(" ===================>>>>> SetTarget"));
+		// UE_LOG(LogClass, Log, TEXT(" ===================>>>>> SetTarget"));
 	}
 }
