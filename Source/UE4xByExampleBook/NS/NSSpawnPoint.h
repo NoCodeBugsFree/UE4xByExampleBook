@@ -18,13 +18,13 @@ protected:
 	ANSSpawnPoint();
 
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void Tick(float DeltaTime) override;
 
 	/** sets the capsule color  */
-	virtual void OnConstruction(const FTransform& Transform) override;
+	void OnConstruction(const FTransform& Transform) override;
 	
 	/** overlap begins. check if we have not OtherActor in our OverlappingActors array - add it into the array  */
 	UFUNCTION()

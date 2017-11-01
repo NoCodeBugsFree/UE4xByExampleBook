@@ -57,7 +57,7 @@ void AEnemyAIController::SetEnemy(APawn* InPawn)
 	}
 }
 
-class AGladiator* AEnemyAIController::GetEnemy() const
+AGladiator* AEnemyAIController::GetEnemy() const
 {
 	if (BlackboardComp)
 	{

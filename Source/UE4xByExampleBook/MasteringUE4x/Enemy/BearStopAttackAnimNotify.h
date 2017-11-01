@@ -16,6 +16,6 @@ class UE4XBYEXAMPLEBOOK_API UBearStopAttackAnimNotify : public UAnimNotify
 	
 private:
 
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+	void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 };

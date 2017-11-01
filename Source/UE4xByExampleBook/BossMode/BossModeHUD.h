@@ -17,7 +17,7 @@ class UE4XBYEXAMPLEBOOK_API ABossModeHUD : public AHUD
 protected:
 	
 	/** Calls each frame to Draw the HUD  */
-	virtual void DrawHUD() override;
+	void DrawHUD() override;
 
 private:
 	

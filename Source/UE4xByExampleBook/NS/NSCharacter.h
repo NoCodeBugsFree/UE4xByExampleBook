@@ -72,11 +72,11 @@ protected:
 
 	ANSCharacter();
 
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
-	virtual void Tick(float DeltaSeconds) override;
+	void Tick(float DeltaSeconds) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	/** Returns properties that are replicated for the lifetime of the actor channel */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -89,14 +89,14 @@ protected:
 	* @param DamageCauser		The Actor that directly caused the damage (e.g. the projectile that exploded, the rock that landed on you)
 	* @return					The amount of damage actually applied.
 	*/
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	/**
 	* Called when this Pawn is possessed. Only called on the server (or in standalone).
 	*	@param C The controller possessing this pawn
 	* determines what happens when an owning-client character is possessed
 	*/
-	virtual void PossessedBy(AController* NewController) override;
+	void PossessedBy(AController* NewController) override;
 
 
 

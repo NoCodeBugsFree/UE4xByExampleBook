@@ -18,7 +18,7 @@ private:
 		
 	/** Native update override point. It is usually a good idea to simply gather data in this step and
 		for the bulk of the work to be done in NativeUpdateAnimation.  */
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	/** Attacking animation number allows different animations each attack  */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))

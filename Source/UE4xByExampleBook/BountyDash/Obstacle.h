@@ -17,10 +17,10 @@ protected:
 	AObstacle();
 	
 	UFUNCTION()
-	virtual void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
+	void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
 	
 	UFUNCTION()
-	virtual void MyOnActorEndOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
+	void MyOnActorEndOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
 
 private:
 

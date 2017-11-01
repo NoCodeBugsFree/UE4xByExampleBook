@@ -287,7 +287,7 @@ void AGladiator::OnChangeWeapon()
 	if (IsControlable)
 	{
 		WeaponIndex++;
-		/** TODO AllWeaponsData ! */
+		/** AllWeaponsData ! */
 		/*if (WeaponIndex < TablesInstance->AllWeaponsData.Num())
 		{
 			WeaponIndex++;

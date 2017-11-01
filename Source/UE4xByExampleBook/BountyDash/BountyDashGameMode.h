@@ -18,7 +18,7 @@ public:
 
 	ABountyDashGameMode();
 
-	virtual void Tick(float DeltaSeconds) override;
+	void Tick(float DeltaSeconds) override;
 
 	/**  Changes game values based on that score  */
 	UFUNCTION(BlueprintCallable, Category = "AAA")

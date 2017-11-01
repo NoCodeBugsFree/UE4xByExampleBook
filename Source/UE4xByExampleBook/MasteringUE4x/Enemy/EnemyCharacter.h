@@ -35,7 +35,7 @@ protected:
 	AEnemyCharacter();
 
 	/**  Allow actors to initialize themselves on the C++ side */
-	virtual void PostInitializeComponents() override;
+	void PostInitializeComponents() override;
 	
 private:
 	

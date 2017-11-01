@@ -19,7 +19,7 @@ protected:
 	AVSEnemyAIController();
 
 	/** Initialize Blackboard and Start Behavior Tree  */
-	virtual void Possess(APawn* Pawn) override;
+	void Possess(APawn* Pawn) override;
 
 private:
 	

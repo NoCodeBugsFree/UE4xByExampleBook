@@ -30,7 +30,7 @@ protected:
 	UStaticMeshComponent* PowerUpMesh;
 
 	UFUNCTION()
-	virtual void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
+	void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
 
 private:
 	

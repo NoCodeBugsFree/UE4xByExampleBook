@@ -16,7 +16,7 @@ class UE4XBYEXAMPLEBOOK_API AUE4xByExampleBookGameModeBase : public AGameModeBas
 	
 public:
 
-
+	int32 Ammo;
 
 protected:
 

@@ -15,11 +15,11 @@ class UE4XBYEXAMPLEBOOK_API AVSGameMode : public AGameMode
 	GENERATED_BODY()
 	
 protected:
-	
-	virtual void BeginPlay() override;
+
+	void BeginPlay() override;
 
    /** Called after a successful login.  This is the first place it is safe to call replicated functions on the PlayerController. 
-    * TODO remove TargetGoal and CurrentRound variables to GameState
+    * remove TargetGoal and CurrentRound variables to GameState
     */
 	virtual void PostLogin(APlayerController* NewPlayer);
 	

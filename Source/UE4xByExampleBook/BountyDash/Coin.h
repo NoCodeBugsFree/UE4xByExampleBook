@@ -17,7 +17,7 @@ class UE4XBYEXAMPLEBOOK_API ACoin : public ABountyDashObject
 public:
 	
 	UFUNCTION()
-	virtual void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
+	void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor) override;
 	
 	/** Shows whether the character is magnet or not */
 	bool bIsBeingPulled;
@@ -26,7 +26,7 @@ protected:
 
 	ACoin();
 
-	virtual void Tick(float DeltaSeconds) override;
+	void Tick(float DeltaSeconds) override;
 
 	/** Calls to handle character colliding  */
 	void CollideWithCharacter(AActor* OtherActor);

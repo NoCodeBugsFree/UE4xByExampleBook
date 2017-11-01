@@ -41,13 +41,13 @@ protected:
 	* @param InPawn The Pawn to be possessed.
 	* @see HasAuthority()
 	*/
-	virtual void Possess(APawn* InPawn) override;
+	void Possess(APawn* InPawn) override;
 
 	/** calls in posses to initialize blackboard and start behavior tree  */
 	void InitBlackBoardAndStartBehaviorTree(APawn* InPawn);
 
 	/** State entered when inactive (no possessed pawn, not spectating, etc). */
-	virtual void BeginInactiveState() override;
+	void BeginInactiveState() override;
 
 	/** sets the enemy reference  */
 	UFUNCTION(BlueprintCallable, Category = "AAA")

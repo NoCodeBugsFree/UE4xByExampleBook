@@ -20,10 +20,10 @@ private:
 	void UpdateHUD();
 	
 	/** calls when widget is constructed  */
-	virtual void NativeConstruct() override;
+	void NativeConstruct() override;
 	
 	/** call every frame  */
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	/** widget owner character reference  */
 	class AVSCharacter* WidgetOwnerVSCharacter;

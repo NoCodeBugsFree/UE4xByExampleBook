@@ -16,7 +16,7 @@ class UE4XBYEXAMPLEBOOK_API UBTTaskNode_RandomMoveTo : public UBTTaskNode
 	
 private:
 
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	class UBehaviorTree* ThisTree;
 

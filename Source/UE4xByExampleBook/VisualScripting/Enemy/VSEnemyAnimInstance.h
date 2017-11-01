@@ -20,7 +20,7 @@ private:
 
 	// Native update override point. It is usually a good idea to simply gather data in this step and 
 	// for the bulk of the work to be done in NativeUpdateAnimation.
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 	/**  shows whether we need to play attack anim or not */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAA", meta = (AllowPrivateAccess = "true"))

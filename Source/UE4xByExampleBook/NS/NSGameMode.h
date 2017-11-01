@@ -27,16 +27,16 @@ public:
 
 	ANSGameMode();
 
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
-	virtual void Tick(float DeltaSeconds) override;
+	void Tick(float DeltaSeconds) override;
 
 	/** 
 		Called after a successful login.  This is the first place it is safe to call replicated functions on the PlayerController.
 		 This method will be called whenever a new client joins the server session
 		and will parse the new PlayerController that has connected
 	*/
-	virtual void PostLogin(APlayerController* NewPlayer) override;
+	void PostLogin(APlayerController* NewPlayer) override;
 
 	/** Overridable function called whenever this actor is being removed from a level
 	 *
@@ -44,7 +44,7 @@ public:
 	 * that it is in fact either a definite quit event or end PIE session event. If so, we are to
      * reset our static Boolean flag "bInGameMenu" so the game always starts in menu.
 	 */
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/** Calls to respawn the player after death  */
 	UFUNCTION(BlueprintAuthorityOnly, BlueprintCallable, Category = "AAA")

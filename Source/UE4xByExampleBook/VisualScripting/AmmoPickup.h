@@ -18,7 +18,7 @@ protected:
 
 	AAmmoPickup();
 
-	virtual void PostInitializeComponents() override;
+	void PostInitializeComponents() override;
 
 private:
 

@@ -27,10 +27,10 @@ protected:
 	ABountyDashObject();
 
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	virtual void MyOnActorOverlap(AActor* OverlappedActor, AActor* OtherActor);

@@ -21,7 +21,7 @@ public:
 	float GetCoinValue() const { return CoinValue; }
 
 	/** calls when this pickup was collected  */
-	virtual void OnGetCollected_Implementation(AActor* OtherActor) override;
+	void OnGetCollected_Implementation(AActor* OtherActor) override;
 
 protected:
 	

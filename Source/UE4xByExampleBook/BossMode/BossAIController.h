@@ -33,9 +33,9 @@ public:
 
 	ABossAIController();
 
-	virtual void Possess(APawn* InPawn) override;
+	void Possess(APawn* InPawn) override;
 
-	virtual void Tick(float DeltaTime) override;
+	void Tick(float DeltaTime) override;
 	
 	
 	/** Sets the bIsTracking flag according to BB data  */

@@ -15,11 +15,11 @@ class UE4XBYEXAMPLEBOOK_API ABountyDashHUD : public AHUD
 	GENERATED_BODY()
 	
 private:
-	
-	virtual void BeginPlay() override;
+
+	void BeginPlay() override;
 
 	/** Calls every tick to draw actual HUD  */
-	virtual void DrawHUD() override;
+	void DrawHUD() override;
 
 	// -----------------------------------------------------------------------------------
 

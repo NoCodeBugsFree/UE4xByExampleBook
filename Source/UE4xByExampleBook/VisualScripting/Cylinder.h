@@ -18,9 +18,9 @@ private:
 
 	ACylinder();
 
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
-	virtual void Tick(float DeltaSeconds) override;
+	void Tick(float DeltaSeconds) override;
 
 	/**
 	* Event when this actor bumps into a blocking object, or blocks another actor that bumps into it.
@@ -31,7 +31,7 @@ private:
 	* @note When receiving a hit from another object's movement (bSelfMoved is false), the directions of 'Hit.Normal' and 'Hit.ImpactNormal'
 	* will be adjusted to indicate force from the other object against this object.
 	*/
-	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 	
 	/** calls to reverse movement direction  */
 	UFUNCTION(BlueprintCallable, Category = "AAA")
