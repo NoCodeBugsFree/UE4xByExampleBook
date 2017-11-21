@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DestroyedFloorPiece.h"
-#include "Components/DestructibleComponent.h"
 #include "Components/SceneComponent.h"
 
 // Sets default values
@@ -13,11 +12,11 @@ ADestroyedFloorPiece::ADestroyedFloorPiece()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	check(RootComponent);
 
-	Destructable = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Destructable"));
+	/*Destructable = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Destructable"));
 	check(Destructable);
 
 	Destructable->SetupAttachment(RootComponent);
-	Destructable->SetCollisionProfileName("OverlapAllDynamic");
+	Destructable->SetCollisionProfileName("OverlapAllDynamic");*/
 
 	InitialLifeSpan = 4.f;
 }

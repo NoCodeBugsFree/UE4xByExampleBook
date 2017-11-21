@@ -25,12 +25,12 @@ protected:
 private:
 
 	/** Destructible Mesh Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
-	class UDestructibleComponent* DestructibleMesh;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AAA", meta = (AllowPrivateAccess = "true"))
+	// class UDestructibleComponent* DestructibleMesh;
 	
 public:	
 	
 	/** Returns Destructible Component   */
-	FORCEINLINE class UDestructibleComponent* GetDestructable() const { return DestructibleMesh; }
+	// FORCEINLINE class UDestructibleComponent* GetDestructable() const { return DestructibleMesh; }
 	
 };

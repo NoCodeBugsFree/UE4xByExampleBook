@@ -265,12 +265,11 @@ void ANSCharacter::Fire(const FVector Position, const FVector Direction)
 			* @param	bLooping				Whether the pattern should be played repeatedly or be a single one shot
 			* @param	Tag						A tag that allows stopping of an effect.  If another effect with this Tag is playing, it will be stopped and replaced
 			*/
-
-			// UFUNCTION(unreliable, client, BlueprintCallable, Category = "Game|Feedback")
-			// void APlayerController::ClientPlayForceFeedback(class UForceFeedbackEffect* ForceFeedbackEffect, bool bLooping, FName Tag);
+			
 			if (HitSuccessFeedback)
 			{
-				PlayerController->ClientPlayForceFeedback(HitSuccessFeedback, false, NAME_None);
+				
+				// PlayerController->ClientPlayForceFeedback(HitSuccessFeedback, false, NAME_None, false, false, FName(TEXT("")));
 			}
 		}
 	}

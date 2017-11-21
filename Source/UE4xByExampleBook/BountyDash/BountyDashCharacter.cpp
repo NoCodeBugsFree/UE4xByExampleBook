@@ -12,7 +12,7 @@
 #include "BountyDashGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Coin.h"
-#include "Components/DestructibleComponent.h"
+//#include "Components/DestructibleComponent.h"
 #include "Floor.h"
 #include "Components/AudioComponent.h"
 
@@ -323,7 +323,7 @@ void ABountyDashCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedCompone
 				AObstacle* Obstacle = Cast<AObstacle>(OtherActor);
 				if (Obstacle && bCanSmash)
 				{
-					Obstacle->GetDestructable()->ApplyRadiusDamage(10000.f, GetActorLocation(), 10000.f, 10000.f, true);
+					// Obstacle->GetDestructable()->ApplyRadiusDamage(10000.f, GetActorLocation(), 10000.f, 10000.f, true);
 				}
 				else
 				{

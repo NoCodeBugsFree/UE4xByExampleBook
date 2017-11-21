@@ -7,7 +7,7 @@
 #include "UE4xByExampleBook.h"
 #include "BountyDashGameMode.h"
 #include "DestroyedFloorPiece.h"
-#include "Components/DestructibleComponent.h"
+//#include "Components/DestructibleComponent.h"
 
 // Sets default values
 AFloor::AFloor()
@@ -100,8 +100,8 @@ void AFloor::Tick(float DeltaTime)
 					Scene->GetComponentTransform());
 				if (ThisPiece)
 				{
-					ThisPiece->Destructable->ApplyDamage(100000, ThisPiece->GetActorLocation(),
-						FVector(-FMath::RandRange(-10, 10), -FMath::RandRange(-10, 10), -FMath::RandRange(-10, 10)), 10000);
+					// ThisPiece->Destructable->ApplyDamage(100000, ThisPiece->GetActorLocation(),
+						//FVector(-FMath::RandRange(-10, 10), -FMath::RandRange(-10, 10), -FMath::RandRange(-10, 10)), 10000);
 				}
 				/**
 					Once the game has built, play the project then 
