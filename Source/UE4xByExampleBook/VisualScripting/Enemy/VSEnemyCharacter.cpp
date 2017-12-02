@@ -12,6 +12,7 @@
 #include "Components/CapsuleComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "VisualScripting/Enemy/UI/MyUserWidget.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
 AVSEnemyCharacter::AVSEnemyCharacter()

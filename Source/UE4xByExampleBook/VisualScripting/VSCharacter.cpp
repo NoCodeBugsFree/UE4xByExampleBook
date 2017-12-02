@@ -9,6 +9,7 @@
 #include "VSGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Animation/AnimInstance.h"
 
 
 // Sets default values

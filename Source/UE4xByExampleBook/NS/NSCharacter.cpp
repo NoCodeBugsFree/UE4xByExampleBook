@@ -13,6 +13,7 @@
 #include "NSPlayerState.h"
 #include "NSGameMode.h"
 #include "DrawDebugHelpers.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
 ANSCharacter::ANSCharacter()

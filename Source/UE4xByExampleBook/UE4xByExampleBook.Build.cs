@@ -11,9 +11,9 @@ public class UE4xByExampleBook : ModuleRules
         MinFilesUsingPrecompiledHeaderOverride = 1;
         bFasterWithoutUnity = true;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PowerUpPlugin", "AIModule", "GameplayTasks", "Paper2D", "UMG" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PowerUpPlugin", "AIModule", "GameplayTasks", "Paper2D", "UMG", "AssetTools", "MainFrame", "AppFramework", "Landscape", "LandscapeEditor", "HTTP" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "Paper2D", "Slate", "SlateCore" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "Paper2D", "Slate", "SlateCore", "UMG" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

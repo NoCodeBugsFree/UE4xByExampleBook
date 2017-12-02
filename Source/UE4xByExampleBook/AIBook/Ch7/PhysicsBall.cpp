@@ -174,7 +174,7 @@ void APhysicsBall::CalculateDirection()
 void APhysicsBall::ApplyTorqueToBall()
 {
 	FVector Torque = Direction * FVector(RollTorque, RollTorque, 0.f);
-	BallMesh->AddTorque(Torque, NAME_None, true);
+	BallMesh->AddTorqueInRadians(Torque, NAME_None, true);
 }
 
 void APhysicsBall::Bounce()
